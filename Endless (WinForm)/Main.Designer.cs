@@ -68,16 +68,18 @@
             tssPlaylistMenu = new ToolStripSeparator();
             tsmiRemoveFromPlaylist = new ToolStripMenuItem();
             lbQueue = new ListBox();
-            nudVolume = new NumericUpDown();
-            toolTip = new ToolTip(components);
             cmsQueue = new ContextMenuStrip(components);
             tsmiQueuePlay = new ToolStripMenuItem();
-            ofdAddSong = new OpenFileDialog();
             tsmiQueuePlayNext = new ToolStripMenuItem();
             tssQueue = new ToolStripSeparator();
-            tsmiRemoveFromQueue = new ToolStripMenuItem();
             tsmiMoveUp = new ToolStripMenuItem();
             tsmiMoveDown = new ToolStripMenuItem();
+            tsmiRemoveFromQueue = new ToolStripMenuItem();
+            nudVolume = new NumericUpDown();
+            toolTip = new ToolTip(components);
+            ofdAddSong = new OpenFileDialog();
+            tDuration = new System.Windows.Forms.Timer(components);
+            tControls = new System.Windows.Forms.Timer(components);
             tsTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbAlbum).BeginInit();
             ((System.ComponentModel.ISupportInitialize)tbPosition).BeginInit();
@@ -86,8 +88,8 @@
             splitContainer1.Panel2.SuspendLayout();
             splitContainer1.SuspendLayout();
             cmsPlaylist.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)nudVolume).BeginInit();
             cmsQueue.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nudVolume).BeginInit();
             SuspendLayout();
             // 
             // tsTop
@@ -211,6 +213,7 @@
             tsbPrevious.Size = new Size(23, 22);
             tsbPrevious.Text = "Previous";
             tsbPrevious.ToolTipText = "Previous";
+            tsbPrevious.Click += tsbPrevious_Click;
             // 
             // tsbSeekBack
             // 
@@ -221,6 +224,7 @@
             tsbSeekBack.Name = "tsbSeekBack";
             tsbSeekBack.Size = new Size(23, 22);
             tsbSeekBack.Text = "Seek back";
+            tsbSeekBack.Click += tsbSeekBack_Click;
             // 
             // tsbPlay
             // 
@@ -231,6 +235,7 @@
             tsbPlay.Name = "tsbPlay";
             tsbPlay.Size = new Size(23, 22);
             tsbPlay.Text = "Play";
+            tsbPlay.Click += tsbPlay_Click;
             // 
             // tsbPause
             // 
@@ -241,6 +246,7 @@
             tsbPause.Name = "tsbPause";
             tsbPause.Size = new Size(23, 22);
             tsbPause.Text = "Pause";
+            tsbPause.Click += tsbPause_Click;
             // 
             // tsbStop
             // 
@@ -251,6 +257,7 @@
             tsbStop.Name = "tsbStop";
             tsbStop.Size = new Size(23, 22);
             tsbStop.Text = "Stop";
+            tsbStop.Click += tsbStop_Click;
             // 
             // tsbSeekForward
             // 
@@ -261,6 +268,7 @@
             tsbSeekForward.Name = "tsbSeekForward";
             tsbSeekForward.Size = new Size(23, 22);
             tsbSeekForward.Text = "Seek Forward";
+            tsbSeekForward.Click += tsbSeekForward_Click;
             // 
             // tsbNext
             // 
@@ -271,6 +279,7 @@
             tsbNext.Name = "tsbNext";
             tsbNext.Size = new Size(23, 22);
             tsbNext.Text = "Next";
+            tsbNext.Click += tsbNext_Click;
             // 
             // tssBasic2
             // 
@@ -279,7 +288,6 @@
             // 
             // tslDuration
             // 
-            tslDuration.Enabled = false;
             tslDuration.Name = "tslDuration";
             tslDuration.Size = new Size(66, 22);
             tslDuration.Text = "00:00/00:00";
@@ -288,7 +296,6 @@
             // pbAlbum
             // 
             pbAlbum.BorderStyle = BorderStyle.FixedSingle;
-            pbAlbum.Enabled = false;
             pbAlbum.Location = new Point(12, 28);
             pbAlbum.Name = "pbAlbum";
             pbAlbum.Size = new Size(114, 114);
@@ -338,11 +345,13 @@
             // 
             // tbPosition
             // 
-            tbPosition.Enabled = false;
             tbPosition.Location = new Point(132, 97);
             tbPosition.Name = "tbPosition";
             tbPosition.Size = new Size(311, 45);
             tbPosition.TabIndex = 8;
+            tbPosition.TickFrequency = 60;
+            tbPosition.TickStyle = TickStyle.Both;
+            tbPosition.Scroll += tbPosition_Seek;
             // 
             // splitContainer1
             // 
@@ -370,10 +379,10 @@
             lbList.Name = "lbList";
             lbList.Size = new Size(243, 403);
             lbList.TabIndex = 0;
+            lbList.DoubleClick += lbList_DoubleClick;
             // 
             // cmsPlaylist
             // 
-            cmsPlaylist.Enabled = false;
             cmsPlaylist.Items.AddRange(new ToolStripItem[] { tsmiPlaylistPlay, tsmiPlaylistPlayNext, tssPlaylistMenu, tsmiRemoveFromPlaylist });
             cmsPlaylist.Name = "cmsPlaylist";
             cmsPlaylist.Size = new Size(187, 76);
@@ -382,10 +391,10 @@
             // 
             // tsmiPlaylistPlay
             // 
-            tsmiPlaylistPlay.Enabled = false;
             tsmiPlaylistPlay.Name = "tsmiPlaylistPlay";
             tsmiPlaylistPlay.Size = new Size(186, 22);
             tsmiPlaylistPlay.Text = "Play";
+            tsmiPlaylistPlay.Click += lbList_DoubleClick;
             // 
             // tsmiPlaylistPlayNext
             // 
@@ -417,20 +426,8 @@
             lbQueue.Size = new Size(240, 403);
             lbQueue.TabIndex = 0;
             // 
-            // nudVolume
-            // 
-            nudVolume.Enabled = false;
-            nudVolume.Location = new Point(449, 105);
-            nudVolume.Name = "nudVolume";
-            nudVolume.Size = new Size(50, 23);
-            nudVolume.TabIndex = 10;
-            nudVolume.Tag = "";
-            toolTip.SetToolTip(nudVolume, "Volume");
-            nudVolume.Value = new decimal(new int[] { 100, 0, 0, 0 });
-            // 
             // cmsQueue
             // 
-            cmsQueue.Enabled = false;
             cmsQueue.Items.AddRange(new ToolStripItem[] { tsmiQueuePlay, tsmiQueuePlayNext, tssQueue, tsmiMoveUp, tsmiMoveDown, tsmiRemoveFromQueue });
             cmsQueue.Name = "cmsQueue";
             cmsQueue.Size = new Size(185, 120);
@@ -439,19 +436,10 @@
             // 
             // tsmiQueuePlay
             // 
-            tsmiQueuePlay.Enabled = false;
             tsmiQueuePlay.Name = "tsmiQueuePlay";
             tsmiQueuePlay.Size = new Size(184, 22);
             tsmiQueuePlay.Text = "Play";
-            // 
-            // ofdAddSong
-            // 
-            ofdAddSong.DefaultExt = "mp3";
-            ofdAddSong.Filter = "MP3 files|*.mp3";
-            ofdAddSong.InitialDirectory = "E:\\Dokumenty Vojta\\Hudba";
-            ofdAddSong.Multiselect = true;
-            ofdAddSong.RestoreDirectory = true;
-            ofdAddSong.Title = "Add Song...";
+            tsmiQueuePlay.Click += lbList_DoubleClick;
             // 
             // tsmiQueuePlayNext
             // 
@@ -464,13 +452,6 @@
             // 
             tssQueue.Name = "tssQueue";
             tssQueue.Size = new Size(181, 6);
-            // 
-            // tsmiRemoveFromQueue
-            // 
-            tsmiRemoveFromQueue.Enabled = false;
-            tsmiRemoveFromQueue.Name = "tsmiRemoveFromQueue";
-            tsmiRemoveFromQueue.Size = new Size(184, 22);
-            tsmiRemoveFromQueue.Text = "Remove from Queue";
             // 
             // tsmiMoveUp
             // 
@@ -485,6 +466,45 @@
             tsmiMoveDown.Name = "tsmiMoveDown";
             tsmiMoveDown.Size = new Size(184, 22);
             tsmiMoveDown.Text = "Move Down";
+            // 
+            // tsmiRemoveFromQueue
+            // 
+            tsmiRemoveFromQueue.Enabled = false;
+            tsmiRemoveFromQueue.Name = "tsmiRemoveFromQueue";
+            tsmiRemoveFromQueue.Size = new Size(184, 22);
+            tsmiRemoveFromQueue.Text = "Remove from Queue";
+            // 
+            // nudVolume
+            // 
+            nudVolume.Location = new Point(449, 105);
+            nudVolume.Name = "nudVolume";
+            nudVolume.Size = new Size(50, 23);
+            nudVolume.TabIndex = 10;
+            nudVolume.Tag = "";
+            toolTip.SetToolTip(nudVolume, "Volume\r\nPress Middle Mouse Button to toggle Mute.");
+            nudVolume.Value = new decimal(new int[] { 100, 0, 0, 0 });
+            nudVolume.ValueChanged += nudVolume_ValueChanged;
+            nudVolume.MouseUp += nudVolume_MouseClick;
+            // 
+            // ofdAddSong
+            // 
+            ofdAddSong.DefaultExt = "mp3";
+            ofdAddSong.Filter = "MP3 files|*.mp3";
+            ofdAddSong.InitialDirectory = "E:\\Dokumenty Vojta\\Hudba";
+            ofdAddSong.Multiselect = true;
+            ofdAddSong.RestoreDirectory = true;
+            ofdAddSong.Title = "Add Song...";
+            // 
+            // tDuration
+            // 
+            tDuration.Interval = 750;
+            tDuration.Tick += tDuration_Tick;
+            // 
+            // tControls
+            // 
+            tControls.Enabled = true;
+            tControls.Interval = 750;
+            tControls.Tick += tControls_Tick;
             // 
             // Main
             // 
@@ -505,7 +525,8 @@
             MaximizeBox = false;
             Name = "Main";
             StartPosition = FormStartPosition.Manual;
-            Text = "Endles";
+            Text = "Endless";
+            FormClosing += Main_FormClosing;
             tsTop.ResumeLayout(false);
             tsTop.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pbAlbum).EndInit();
@@ -515,8 +536,8 @@
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
             splitContainer1.ResumeLayout(false);
             cmsPlaylist.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)nudVolume).EndInit();
             cmsQueue.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)nudVolume).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -571,5 +592,7 @@
         private ToolStripMenuItem tsmiMoveUp;
         private ToolStripMenuItem tsmiMoveDown;
         private ToolStripMenuItem tsmiRemoveFromQueue;
+        private System.Windows.Forms.Timer tDuration;
+        private System.Windows.Forms.Timer tControls;
     }
 }
