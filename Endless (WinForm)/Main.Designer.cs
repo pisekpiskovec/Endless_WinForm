@@ -86,7 +86,6 @@
             // 
             tssbAddSong.DisplayStyle = ToolStripItemDisplayStyle.Image;
             tssbAddSong.DropDownItems.AddRange(new ToolStripItem[] { tsmiAddFolder, tsmiAddSong, toolStripSeparator1, tsmiOpenPlaylist, tsmiOpenQueue, tsmiOpenLastSession });
-            tssbAddSong.Enabled = false;
             tssbAddSong.Image = (Image)resources.GetObject("tssbAddSong.Image");
             tssbAddSong.ImageTransparentColor = Color.Magenta;
             tssbAddSong.Name = "tssbAddSong";
