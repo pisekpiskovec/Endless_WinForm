@@ -34,10 +34,13 @@
             tssbAddSong = new ToolStripSplitButton();
             tsmiAddFolder = new ToolStripMenuItem();
             tsmiAddSong = new ToolStripMenuItem();
-            toolStripSeparator1 = new ToolStripSeparator();
+            tssAdd1 = new ToolStripSeparator();
             tsmiOpenPlaylist = new ToolStripMenuItem();
             tsmiOpenQueue = new ToolStripMenuItem();
             tsmiOpenLastSession = new ToolStripMenuItem();
+            tssAdd2 = new ToolStripSeparator();
+            cleanPlaylistToolStripMenuItem = new ToolStripMenuItem();
+            cleanQueueToolStripMenuItem = new ToolStripMenuItem();
             tssbSavePlaylist = new ToolStripSplitButton();
             tsmiSavePlaylist = new ToolStripMenuItem();
             tsmiSaveQueue = new ToolStripMenuItem();
@@ -85,7 +88,7 @@
             // tssbAddSong
             // 
             tssbAddSong.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            tssbAddSong.DropDownItems.AddRange(new ToolStripItem[] { tsmiAddFolder, tsmiAddSong, toolStripSeparator1, tsmiOpenPlaylist, tsmiOpenQueue, tsmiOpenLastSession });
+            tssbAddSong.DropDownItems.AddRange(new ToolStripItem[] { tsmiAddFolder, tsmiAddSong, tssAdd1, tsmiOpenPlaylist, tsmiOpenQueue, tsmiOpenLastSession, tssAdd2, cleanPlaylistToolStripMenuItem, cleanQueueToolStripMenuItem });
             tssbAddSong.Image = (Image)resources.GetObject("tssbAddSong.Image");
             tssbAddSong.ImageTransparentColor = Color.Magenta;
             tssbAddSong.Name = "tssbAddSong";
@@ -102,17 +105,16 @@
             // 
             // tsmiAddSong
             // 
-            tsmiAddSong.Enabled = false;
             tsmiAddSong.Name = "tsmiAddSong";
             tsmiAddSong.ShortcutKeyDisplayString = "Ctrl+S";
             tsmiAddSong.Size = new Size(182, 22);
             tsmiAddSong.Text = "Add Song";
             tsmiAddSong.Click += tsmiAddSong_Click;
             // 
-            // toolStripSeparator1
+            // tssAdd1
             // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(162, 6);
+            tssAdd1.Name = "tssAdd1";
+            tssAdd1.Size = new Size(179, 6);
             // 
             // tsmiOpenPlaylist
             // 
@@ -132,8 +134,28 @@
             // 
             tsmiOpenLastSession.Enabled = false;
             tsmiOpenLastSession.Name = "tsmiOpenLastSession";
-            tsmiOpenLastSession.Size = new Size(165, 22);
-            tsmiOpenLastSession.Text = "Open last session";
+            tsmiOpenLastSession.Size = new Size(182, 22);
+            tsmiOpenLastSession.Text = "Open Last Session";
+            // 
+            // tssAdd2
+            // 
+            tssAdd2.Name = "tssAdd2";
+            tssAdd2.Size = new Size(179, 6);
+            // 
+            // tsmiCleanPlaylist
+            // 
+            tsmiCleanPlaylist.Enabled = false;
+            tsmiCleanPlaylist.Name = "tsmiCleanPlaylist";
+            tsmiCleanPlaylist.Size = new Size(182, 22);
+            tsmiCleanPlaylist.Text = "Clean Playlist";
+            // 
+            // tsmiCleanQueue
+            // 
+            tsmiCleanQueue.Enabled = false;
+            tsmiCleanQueue.Name = "tsmiCleanQueue";
+            tsmiCleanQueue.ShortcutKeyDisplayString = "Ctrl+L";
+            tsmiCleanQueue.Size = new Size(182, 22);
+            tsmiCleanQueue.Text = "Clean Queue";
             // 
             // tssbSavePlaylist
             // 
@@ -428,9 +450,12 @@
         private ListBox lbQueue;
         private ToolStripMenuItem tsmiAddFolder;
         private ToolStripMenuItem tsmiAddSong;
-        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripSeparator tssAdd1;
         private ToolStripMenuItem tsmiOpenLastSession;
         private ToolTip toolTip;
         private OpenFileDialog ofdAddSong;
+        private ToolStripSeparator tssAdd2;
+        private ToolStripMenuItem tsmiCleanPlaylist;
+        private ToolStripMenuItem tsmiCleanQueue;
     }
 }
