@@ -62,6 +62,7 @@
             lbQueue = new ListBox();
             nudVolume = new NumericUpDown();
             toolTip = new ToolTip(components);
+            ofdAddSong = new OpenFileDialog();
             tsTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbAlbum).BeginInit();
             ((System.ComponentModel.ISupportInitialize)tbPosition).BeginInit();
@@ -91,6 +92,7 @@
             tssbAddSong.Name = "tssbAddSong";
             tssbAddSong.Size = new Size(32, 22);
             tssbAddSong.Text = "Add Song";
+            tssbAddSong.ButtonClick += tsmiAddSong_Click;
             // 
             // tsmiAddFolder
             // 
@@ -103,8 +105,10 @@
             // 
             tsmiAddSong.Enabled = false;
             tsmiAddSong.Name = "tsmiAddSong";
-            tsmiAddSong.Size = new Size(165, 22);
+            tsmiAddSong.ShortcutKeyDisplayString = "Ctrl+S";
+            tsmiAddSong.Size = new Size(182, 22);
             tsmiAddSong.Text = "Add Song";
+            tsmiAddSong.Click += tsmiAddSong_Click;
             // 
             // toolStripSeparator1
             // 
@@ -352,6 +356,15 @@
             toolTip.SetToolTip(nudVolume, "Volume");
             nudVolume.Value = new decimal(new int[] { 100, 0, 0, 0 });
             // 
+            // ofdAddSong
+            // 
+            ofdAddSong.DefaultExt = "mp3";
+            ofdAddSong.Filter = "MP3 files|*.mp3";
+            ofdAddSong.InitialDirectory = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyMusic);
+            ofdAddSong.Multiselect = true;
+            ofdAddSong.RestoreDirectory = true;
+            ofdAddSong.Title = "Add Song...";
+            // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -419,5 +432,6 @@
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem tsmiOpenLastSession;
         private ToolTip toolTip;
+        private OpenFileDialog ofdAddSong;
     }
 }
