@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <PackageReference Include="Mpv.NET" Version="1.2.0" />
+    <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
 
   <ItemGroup>
