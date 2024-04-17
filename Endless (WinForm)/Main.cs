@@ -1,5 +1,7 @@
 using Mpv.NET.Player;
 using System.ComponentModel;
+using Mpv.NET.Player;
+using TagLib;
 
 namespace Endless__WinForm_
 {
@@ -12,6 +14,7 @@ namespace Endless__WinForm_
         bool isMediaLoaded = false, isMediaPlaying = false;
         string mediaPath;
         int saveLocalVolume = 0, queueIndex = 0;
+        TagLib.File musFile;
 
         public Main()
         {
@@ -26,7 +29,7 @@ namespace Endless__WinForm_
         {
             if (Path.GetExtension(FileName) == ".m3u")
             {
-                string[] inputing = File.ReadAllLines(FileName);
+                string[] inputing = System.IO.File.ReadAllLines(FileName);
                 foreach (string item in inputing) { fileLoad(item); }
             }
             else { playlist.Add(FileName); }
@@ -50,6 +53,16 @@ namespace Endless__WinForm_
             player.Resume();
             isMediaPlaying = true;
             tDuration.Start();
+
+            musFile = TagLib.File.Create(path);
+            if(musFile.Tag.Pictures.Length > 0) { pbAlbum.BackgroundImage = Image.FromStream(new MemoryStream(musFile.Tag.Pictures[0].Data.Data)); }
+            else { /* continue in code*/ }
+            lTitle.Text = musFile.Tag.Title;
+            lArtist.Text = string.Join("; ", musFile.Tag.Performers);
+            lNumbers.Text = string.Empty;
+            lNumbers.Text = (musFile.Tag.Track.ToString() ?? "0") + "/";
+            lNumbers.Text += (musFile.Tag.Disc.ToString() ?? "0") + "/";
+            lNumbers.Text += (musFile.Tag.Year.ToString() ?? "0000");
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e) { player.Dispose(); }

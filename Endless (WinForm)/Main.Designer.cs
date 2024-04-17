@@ -295,6 +295,7 @@
             // 
             // pbAlbum
             // 
+            pbAlbum.BackgroundImageLayout = ImageLayout.Zoom;
             pbAlbum.BorderStyle = BorderStyle.FixedSingle;
             pbAlbum.Location = new Point(12, 28);
             pbAlbum.Name = "pbAlbum";
@@ -305,7 +306,6 @@
             // lTitle
             // 
             lTitle.AutoSize = true;
-            lTitle.Enabled = false;
             lTitle.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 238);
             lTitle.Location = new Point(132, 28);
             lTitle.Name = "lTitle";
@@ -316,7 +316,6 @@
             // lArtist
             // 
             lArtist.AutoSize = true;
-            lArtist.Enabled = false;
             lArtist.Location = new Point(132, 49);
             lArtist.Name = "lArtist";
             lArtist.Size = new Size(35, 15);
@@ -326,7 +325,6 @@
             // lAlbum
             // 
             lAlbum.AutoSize = true;
-            lAlbum.Enabled = false;
             lAlbum.Location = new Point(132, 64);
             lAlbum.Name = "lAlbum";
             lAlbum.Size = new Size(43, 15);
@@ -336,7 +334,6 @@
             // lNumbers
             // 
             lNumbers.AutoSize = true;
-            lNumbers.Enabled = false;
             lNumbers.Location = new Point(132, 79);
             lNumbers.Name = "lNumbers";
             lNumbers.Size = new Size(46, 15);
@@ -349,7 +346,7 @@
             tbPosition.Name = "tbPosition";
             tbPosition.Size = new Size(311, 45);
             tbPosition.TabIndex = 8;
-            tbPosition.TickFrequency = 60;
+            tbPosition.TickFrequency = 5;
             tbPosition.TickStyle = TickStyle.Both;
             tbPosition.Scroll += tbPosition_Seek;
             // 
