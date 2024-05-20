@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Endless_WinForm.Properties;
 using Mpv.NET.Player;
 
 namespace Endless__WinForm_
@@ -68,7 +69,7 @@ namespace Endless__WinForm_
 
             musFile = TagLib.File.Create(path);
             if (musFile.Tag.Pictures.Length > 0) { pbAlbum.BackgroundImage = Image.FromStream(new MemoryStream(musFile.Tag.Pictures[0].Data.Data)); }
-            else { /* continue in code*/ }
+            else { pbAlbum.BackgroundImage = Resources.generic_music_file_100px; }
             lTitle.Text = musFile.Tag.Title;
             lArtist.Text = string.Join("; ", musFile.Tag.Performers);
             lNumbers.Text = string.Empty;
