@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.IO;
 using Endless_WinForm.Properties;
 using Mpv.NET.Player;
 
@@ -44,9 +45,12 @@ namespace Endless__WinForm_
             openFileDialog.RestoreDirectory = true;
             openFileDialog.InitialDirectory = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyMusic);
 
-            try { if (openFileDialog.ShowDialog() == DialogResult.OK)
-                
-                { for (int i = 0; i < openFileDialog.FileNames.Count(); i++) { fileLoad(openFileDialog.FileNames[i], playlist); } } }
+            try
+            {
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+
+                { for (int i = 0; i < openFileDialog.FileNames.Count(); i++) { fileLoad(openFileDialog.FileNames[i], playlist); } }
+            }
             catch { MessageBox.Show("Opening dialog failed. Please try again.", "Opening dialog failed", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
 
@@ -105,6 +109,17 @@ namespace Endless__WinForm_
             tsbSeekForward.Enabled = player.Duration.TotalSeconds - player.Position.TotalSeconds >= 10;
             tsbNext.Enabled = isMediaLoaded;
             this.Text = isMediaLoaded ? "Endless | " + player.MediaTitle : "Endless";
+            tsmiPlaylistCleanPlaylist.Enabled = playlist.Count > 0;
+            tsmiPlaylistPlay.Enabled = playlist.Count > 0;
+            tsmiPlaylistPlayNext.Enabled = playlist.Count > 0;
+            tsmiRemoveFromPlaylist.Enabled = playlist.Count > 0;
+
+            tsmiQueueCleanQueue.Enabled = queue.Count > 0;
+            tsmiQueuePlay.Enabled = queue.Count > 0;
+            tsmiQueuePlayNext.Enabled = queue.Count > 0;
+            tsmiRemoveFromQueue.Enabled = queue.Count > 0;
+            tsmiMoveDown.Enabled = queue.Count > 0;
+            tsmiMoveUp.Enabled = queue.Count > 0;
         }
 
         private void tsbPrevious_Click(object sender, EventArgs e)
@@ -125,7 +140,7 @@ namespace Endless__WinForm_
         private void tsbSeekBack_Click(object sender, EventArgs e) { player.SeekAsync(player.Position.TotalSeconds - 10); }
         private void tsbPlay_Click(object sender, EventArgs e) { player.Resume(); isMediaPlaying = true; }
         private void tsbPause_Click(object sender, EventArgs e) { player.Pause(); isMediaPlaying = false; }
-        private void tsbStop_Click(object sender, EventArgs e) { player.Stop(); isMediaPlaying = false; isMediaLoaded = false; mediaPath = ""; }
+        private void tsbStop_Click(object sender, EventArgs e) { player.Stop(); isMediaPlaying = false; isMediaLoaded = false; mediaPath = ""; pbAlbum.BackgroundImage = Resources.generic_music_file_100px; }
         private void tsbSeekForward_Click(object sender, EventArgs e) { player.SeekAsync(player.Position.TotalSeconds + 10); }
         private void tsbNext_Click(object sender, EventArgs e)
         {
@@ -209,7 +224,8 @@ namespace Endless__WinForm_
             string[] playlistFile = { sessionDir, "playlist.m3u" };
             string[] queueFile = { sessionDir, "queue.m3u" };
 
-            if (!Directory.Exists(sessionDir)) {
+            if (!Directory.Exists(sessionDir))
+            {
                 Directory.CreateDirectory(sessionDir);
                 MessageBox.Show("Saved session's files eiter don't exsists or are corrupted.", "Can't load last session!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -217,10 +233,10 @@ namespace Endless__WinForm_
 
             StreamReader reader;
             string[] inputing;
-            
+
             reader = new StreamReader(Path.Combine(playlistFile), System.Text.Encoding.Default);
             inputing = reader.ReadToEnd().Split('\n');
-            for(int i = 0; i < inputing.Length-1; i++)
+            for (int i = 0; i < inputing.Length - 1; i++)
             {
                 string str = inputing[i];
                 str = str.Replace("\r", string.Empty);
@@ -234,6 +250,34 @@ namespace Endless__WinForm_
                 string str = inputing[i];
                 str = str.Replace("\r", string.Empty);
                 fileLoad(str, queue);
+            }
+        }
+
+        private void playNext(BindingList<string> list, ListBox listBox)
+        {
+            if (list.Count > 0)
+            {
+                queue.Insert(queueIndex + 1, listBox.Text);
+            }
+        }
+
+        private void tsmiPlaylistPlayNext_Click(object sender, EventArgs e) { playNext(playlist, lbList); }
+        private void tsmiQueuePlayNext_Click(object sender, EventArgs e) { playNext(queue, lbQueue); }
+        private void tsmiRemoveFromPlaylist_Click(object sender, EventArgs e) { playlist.RemoveAt(lbList.SelectedIndex); }
+        private void tsmiRemoveFromQueue_Click(object sender, EventArgs e) { queue.RemoveAt(lbQueue.SelectedIndex); }
+        private void tsmiMoveUp_Click(object sender, EventArgs e) { queue.Move(lbQueue.SelectedIndex, lbQueue.SelectedIndex-1); }
+        private void tsmiMoveDown_Click(object sender, EventArgs e) { queue.Move(lbQueue.SelectedIndex, lbQueue.SelectedIndex + 1); }
+    }
+
+    public static class Listing
+    {
+        public static void Move<T>(this BindingList<T> list, int oldIndex, int newIndex)
+        {
+            T item = list[oldIndex];
+            if (newIndex > -1 && newIndex < list.Count())
+            {
+                list.RemoveAt(oldIndex);
+                list.Insert(newIndex, item);
             }
         }
     }

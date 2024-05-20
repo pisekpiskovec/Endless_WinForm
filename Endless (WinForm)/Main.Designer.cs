@@ -67,6 +67,7 @@
             tsmiPlaylistPlayNext = new ToolStripMenuItem();
             tssPlaylistMenu = new ToolStripSeparator();
             tsmiRemoveFromPlaylist = new ToolStripMenuItem();
+            tsmiPlaylistCleanPlaylist = new ToolStripMenuItem();
             lbQueue = new ListBox();
             cmsQueue = new ContextMenuStrip(components);
             tsmiQueuePlay = new ToolStripMenuItem();
@@ -75,6 +76,7 @@
             tsmiMoveUp = new ToolStripMenuItem();
             tsmiMoveDown = new ToolStripMenuItem();
             tsmiRemoveFromQueue = new ToolStripMenuItem();
+            tsmiQueueCleanQueue = new ToolStripMenuItem();
             nudVolume = new NumericUpDown();
             toolTip = new ToolTip(components);
             tDuration = new System.Windows.Forms.Timer(components);
@@ -387,9 +389,9 @@
             // 
             // cmsPlaylist
             // 
-            cmsPlaylist.Items.AddRange(new ToolStripItem[] { tsmiPlaylistPlay, tsmiPlaylistPlayNext, tssPlaylistMenu, tsmiRemoveFromPlaylist });
+            cmsPlaylist.Items.AddRange(new ToolStripItem[] { tsmiPlaylistPlay, tsmiPlaylistPlayNext, tssPlaylistMenu, tsmiRemoveFromPlaylist, tsmiPlaylistCleanPlaylist });
             cmsPlaylist.Name = "cmsPlaylist";
-            cmsPlaylist.Size = new Size(187, 76);
+            cmsPlaylist.Size = new Size(187, 98);
             cmsPlaylist.Text = "Playlist Item";
             toolTip.SetToolTip(cmsPlaylist, "Playlist Item");
             // 
@@ -402,10 +404,10 @@
             // 
             // tsmiPlaylistPlayNext
             // 
-            tsmiPlaylistPlayNext.Enabled = false;
             tsmiPlaylistPlayNext.Name = "tsmiPlaylistPlayNext";
             tsmiPlaylistPlayNext.Size = new Size(186, 22);
             tsmiPlaylistPlayNext.Text = "Play Next";
+            tsmiPlaylistPlayNext.Click += tsmiPlaylistPlayNext_Click;
             // 
             // tssPlaylistMenu
             // 
@@ -414,10 +416,17 @@
             // 
             // tsmiRemoveFromPlaylist
             // 
-            tsmiRemoveFromPlaylist.Enabled = false;
             tsmiRemoveFromPlaylist.Name = "tsmiRemoveFromPlaylist";
             tsmiRemoveFromPlaylist.Size = new Size(186, 22);
             tsmiRemoveFromPlaylist.Text = "Remove from Playlist";
+            tsmiRemoveFromPlaylist.Click += tsmiRemoveFromPlaylist_Click;
+            // 
+            // tsmiPlaylistCleanPlaylist
+            // 
+            tsmiPlaylistCleanPlaylist.Name = "tsmiPlaylistCleanPlaylist";
+            tsmiPlaylistCleanPlaylist.Size = new Size(186, 22);
+            tsmiPlaylistCleanPlaylist.Text = "Clean Playlist";
+            tsmiPlaylistCleanPlaylist.Click += tsmiCleanPlaylist_Click;
             // 
             // lbQueue
             // 
@@ -432,9 +441,9 @@
             // 
             // cmsQueue
             // 
-            cmsQueue.Items.AddRange(new ToolStripItem[] { tsmiQueuePlay, tsmiQueuePlayNext, tssQueue, tsmiMoveUp, tsmiMoveDown, tsmiRemoveFromQueue });
+            cmsQueue.Items.AddRange(new ToolStripItem[] { tsmiQueuePlay, tsmiQueuePlayNext, tssQueue, tsmiMoveUp, tsmiMoveDown, tsmiRemoveFromQueue, tsmiQueueCleanQueue });
             cmsQueue.Name = "cmsQueue";
-            cmsQueue.Size = new Size(185, 120);
+            cmsQueue.Size = new Size(185, 164);
             cmsQueue.Text = "Queue Item";
             toolTip.SetToolTip(cmsQueue, "Queue Item");
             // 
@@ -447,10 +456,10 @@
             // 
             // tsmiQueuePlayNext
             // 
-            tsmiQueuePlayNext.Enabled = false;
             tsmiQueuePlayNext.Name = "tsmiQueuePlayNext";
             tsmiQueuePlayNext.Size = new Size(184, 22);
             tsmiQueuePlayNext.Text = "Play Next";
+            tsmiQueuePlayNext.Click += tsmiQueuePlayNext_Click;
             // 
             // tssQueue
             // 
@@ -459,24 +468,31 @@
             // 
             // tsmiMoveUp
             // 
-            tsmiMoveUp.Enabled = false;
             tsmiMoveUp.Name = "tsmiMoveUp";
             tsmiMoveUp.Size = new Size(184, 22);
             tsmiMoveUp.Text = "Move Up";
+            tsmiMoveUp.Click += tsmiMoveUp_Click;
             // 
             // tsmiMoveDown
             // 
-            tsmiMoveDown.Enabled = false;
             tsmiMoveDown.Name = "tsmiMoveDown";
             tsmiMoveDown.Size = new Size(184, 22);
             tsmiMoveDown.Text = "Move Down";
+            tsmiMoveDown.Click += tsmiMoveDown_Click;
             // 
             // tsmiRemoveFromQueue
             // 
-            tsmiRemoveFromQueue.Enabled = false;
             tsmiRemoveFromQueue.Name = "tsmiRemoveFromQueue";
             tsmiRemoveFromQueue.Size = new Size(184, 22);
             tsmiRemoveFromQueue.Text = "Remove from Queue";
+            tsmiRemoveFromQueue.Click += tsmiRemoveFromQueue_Click;
+            // 
+            // tsmiQueueCleanQueue
+            // 
+            tsmiQueueCleanQueue.Name = "tsmiQueueCleanQueue";
+            tsmiQueueCleanQueue.Size = new Size(184, 22);
+            tsmiQueueCleanQueue.Text = "Clean Queue";
+            tsmiQueueCleanQueue.Click += tsmiCleanQueue_Click;
             // 
             // nudVolume
             // 
@@ -589,5 +605,7 @@
         private System.Windows.Forms.Timer tDuration;
         private System.Windows.Forms.Timer tControls;
         private ToolStripMenuItem saveSessionToolStripMenuItem;
+        private ToolStripMenuItem tsmiPlaylistCleanPlaylist;
+        private ToolStripMenuItem tsmiQueueCleanQueue;
     }
 }
