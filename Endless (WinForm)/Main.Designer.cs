@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             tsTop = new ToolStrip();
             tssbAddSong = new ToolStripSplitButton();
             tsmiAddFolder = new ToolStripMenuItem();
@@ -44,6 +43,7 @@
             tssbSavePlaylist = new ToolStripSplitButton();
             tsmiSavePlaylist = new ToolStripMenuItem();
             tsmiSaveQueue = new ToolStripMenuItem();
+            saveSessionToolStripMenuItem = new ToolStripMenuItem();
             tssBasic1 = new ToolStripSeparator();
             tsbPrevious = new ToolStripButton();
             tsbSeekBack = new ToolStripButton();
@@ -77,7 +77,6 @@
             tsmiRemoveFromQueue = new ToolStripMenuItem();
             nudVolume = new NumericUpDown();
             toolTip = new ToolTip(components);
-            ofdAddSong = new OpenFileDialog();
             tDuration = new System.Windows.Forms.Timer(components);
             tControls = new System.Windows.Forms.Timer(components);
             tsTop.SuspendLayout();
@@ -105,7 +104,7 @@
             // 
             tssbAddSong.DisplayStyle = ToolStripItemDisplayStyle.Image;
             tssbAddSong.DropDownItems.AddRange(new ToolStripItem[] { tsmiAddFolder, tsmiAddSong, tssAdd1, tsmiOpenPlaylist, tsmiOpenQueue, tsmiOpenLastSession, tssAdd2, tsmiCleanPlaylist, tsmiCleanQueue });
-            tssbAddSong.Image = (Image)resources.GetObject("tssbAddSong.Image");
+            tssbAddSong.Image = Endless_WinForm.Properties.Resources.opened_folder_96px;
             tssbAddSong.ImageTransparentColor = Color.Magenta;
             tssbAddSong.Name = "tssbAddSong";
             tssbAddSong.Size = new Size(32, 22);
@@ -114,10 +113,10 @@
             // 
             // tsmiAddFolder
             // 
-            tsmiAddFolder.Enabled = false;
             tsmiAddFolder.Name = "tsmiAddFolder";
             tsmiAddFolder.Size = new Size(182, 22);
             tsmiAddFolder.Text = "Add Folder";
+            tsmiAddFolder.Click += tsmiAddFolder_Click;
             // 
             // tsmiAddSong
             // 
@@ -134,24 +133,24 @@
             // 
             // tsmiOpenPlaylist
             // 
-            tsmiOpenPlaylist.Enabled = false;
             tsmiOpenPlaylist.Name = "tsmiOpenPlaylist";
             tsmiOpenPlaylist.Size = new Size(182, 22);
             tsmiOpenPlaylist.Text = "Open Playlist";
+            tsmiOpenPlaylist.Click += tsmiOpenPlaylist_Click;
             // 
             // tsmiOpenQueue
             // 
-            tsmiOpenQueue.Enabled = false;
             tsmiOpenQueue.Name = "tsmiOpenQueue";
             tsmiOpenQueue.Size = new Size(182, 22);
             tsmiOpenQueue.Text = "Open Queue";
+            tsmiOpenQueue.Click += tsmiOpenQueue_Click;
             // 
             // tsmiOpenLastSession
             // 
-            tsmiOpenLastSession.Enabled = false;
             tsmiOpenLastSession.Name = "tsmiOpenLastSession";
             tsmiOpenLastSession.Size = new Size(182, 22);
             tsmiOpenLastSession.Text = "Open Last Session";
+            tsmiOpenLastSession.Click += tsmiOpenLastSession_Click;
             // 
             // tssAdd2
             // 
@@ -160,43 +159,50 @@
             // 
             // tsmiCleanPlaylist
             // 
-            tsmiCleanPlaylist.Enabled = false;
             tsmiCleanPlaylist.Name = "tsmiCleanPlaylist";
             tsmiCleanPlaylist.Size = new Size(182, 22);
             tsmiCleanPlaylist.Text = "Clean Playlist";
+            tsmiCleanPlaylist.Click += tsmiCleanPlaylist_Click;
             // 
             // tsmiCleanQueue
             // 
-            tsmiCleanQueue.Enabled = false;
             tsmiCleanQueue.Name = "tsmiCleanQueue";
             tsmiCleanQueue.ShortcutKeyDisplayString = "Ctrl+L";
             tsmiCleanQueue.Size = new Size(182, 22);
             tsmiCleanQueue.Text = "Clean Queue";
+            tsmiCleanQueue.Click += tsmiCleanQueue_Click;
             // 
             // tssbSavePlaylist
             // 
             tssbSavePlaylist.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            tssbSavePlaylist.DropDownItems.AddRange(new ToolStripItem[] { tsmiSavePlaylist, tsmiSaveQueue });
-            tssbSavePlaylist.Enabled = false;
-            tssbSavePlaylist.Image = (Image)resources.GetObject("tssbSavePlaylist.Image");
+            tssbSavePlaylist.DropDownItems.AddRange(new ToolStripItem[] { tsmiSavePlaylist, tsmiSaveQueue, saveSessionToolStripMenuItem });
+            tssbSavePlaylist.Image = Endless_WinForm.Properties.Resources.save_96px;
             tssbSavePlaylist.ImageTransparentColor = Color.Magenta;
             tssbSavePlaylist.Name = "tssbSavePlaylist";
             tssbSavePlaylist.Size = new Size(32, 22);
             tssbSavePlaylist.Text = "Save Playlist";
+            tssbSavePlaylist.ButtonClick += tsmiSavePlaylist_Click;
             // 
             // tsmiSavePlaylist
             // 
-            tsmiSavePlaylist.Enabled = false;
             tsmiSavePlaylist.Name = "tsmiSavePlaylist";
-            tsmiSavePlaylist.Size = new Size(138, 22);
+            tsmiSavePlaylist.Size = new Size(140, 22);
             tsmiSavePlaylist.Text = "Save Playlist";
+            tsmiSavePlaylist.Click += tsmiSavePlaylist_Click;
             // 
             // tsmiSaveQueue
             // 
-            tsmiSaveQueue.Enabled = false;
             tsmiSaveQueue.Name = "tsmiSaveQueue";
-            tsmiSaveQueue.Size = new Size(138, 22);
+            tsmiSaveQueue.Size = new Size(140, 22);
             tsmiSaveQueue.Text = "Save Queue";
+            tsmiSaveQueue.Click += tsmiSaveQueue_Click;
+            // 
+            // saveSessionToolStripMenuItem
+            // 
+            saveSessionToolStripMenuItem.Name = "saveSessionToolStripMenuItem";
+            saveSessionToolStripMenuItem.Size = new Size(140, 22);
+            saveSessionToolStripMenuItem.Text = "Save Session";
+            saveSessionToolStripMenuItem.Click += saveSessionToolStripMenuItem_Click;
             // 
             // tssBasic1
             // 
@@ -207,7 +213,7 @@
             // 
             tsbPrevious.DisplayStyle = ToolStripItemDisplayStyle.Image;
             tsbPrevious.Enabled = false;
-            tsbPrevious.Image = (Image)resources.GetObject("tsbPrevious.Image");
+            tsbPrevious.Image = Endless_WinForm.Properties.Resources.skip_to_start_96px;
             tsbPrevious.ImageTransparentColor = Color.Magenta;
             tsbPrevious.Name = "tsbPrevious";
             tsbPrevious.Size = new Size(23, 22);
@@ -219,7 +225,7 @@
             // 
             tsbSeekBack.DisplayStyle = ToolStripItemDisplayStyle.Image;
             tsbSeekBack.Enabled = false;
-            tsbSeekBack.Image = (Image)resources.GetObject("tsbSeekBack.Image");
+            tsbSeekBack.Image = Endless_WinForm.Properties.Resources.rewind_96px;
             tsbSeekBack.ImageTransparentColor = Color.Magenta;
             tsbSeekBack.Name = "tsbSeekBack";
             tsbSeekBack.Size = new Size(23, 22);
@@ -230,7 +236,7 @@
             // 
             tsbPlay.DisplayStyle = ToolStripItemDisplayStyle.Image;
             tsbPlay.Enabled = false;
-            tsbPlay.Image = (Image)resources.GetObject("tsbPlay.Image");
+            tsbPlay.Image = Endless_WinForm.Properties.Resources.play_96px;
             tsbPlay.ImageTransparentColor = Color.Magenta;
             tsbPlay.Name = "tsbPlay";
             tsbPlay.Size = new Size(23, 22);
@@ -241,7 +247,7 @@
             // 
             tsbPause.DisplayStyle = ToolStripItemDisplayStyle.Image;
             tsbPause.Enabled = false;
-            tsbPause.Image = (Image)resources.GetObject("tsbPause.Image");
+            tsbPause.Image = Endless_WinForm.Properties.Resources.pause_96px;
             tsbPause.ImageTransparentColor = Color.Magenta;
             tsbPause.Name = "tsbPause";
             tsbPause.Size = new Size(23, 22);
@@ -252,7 +258,7 @@
             // 
             tsbStop.DisplayStyle = ToolStripItemDisplayStyle.Image;
             tsbStop.Enabled = false;
-            tsbStop.Image = (Image)resources.GetObject("tsbStop.Image");
+            tsbStop.Image = Endless_WinForm.Properties.Resources.stop_96px;
             tsbStop.ImageTransparentColor = Color.Magenta;
             tsbStop.Name = "tsbStop";
             tsbStop.Size = new Size(23, 22);
@@ -263,7 +269,7 @@
             // 
             tsbSeekForward.DisplayStyle = ToolStripItemDisplayStyle.Image;
             tsbSeekForward.Enabled = false;
-            tsbSeekForward.Image = (Image)resources.GetObject("tsbSeekForward.Image");
+            tsbSeekForward.Image = Endless_WinForm.Properties.Resources.fast_forward_96px;
             tsbSeekForward.ImageTransparentColor = Color.Magenta;
             tsbSeekForward.Name = "tsbSeekForward";
             tsbSeekForward.Size = new Size(23, 22);
@@ -274,7 +280,7 @@
             // 
             tsbNext.DisplayStyle = ToolStripItemDisplayStyle.Image;
             tsbNext.Enabled = false;
-            tsbNext.Image = (Image)resources.GetObject("tsbNext.Image");
+            tsbNext.Image = Endless_WinForm.Properties.Resources.end_96px;
             tsbNext.ImageTransparentColor = Color.Magenta;
             tsbNext.Name = "tsbNext";
             tsbNext.Size = new Size(23, 22);
@@ -295,6 +301,7 @@
             // 
             // pbAlbum
             // 
+            pbAlbum.BackgroundImage = Endless_WinForm.Properties.Resources.generic_music_file_100px;
             pbAlbum.BackgroundImageLayout = ImageLayout.Zoom;
             pbAlbum.BorderStyle = BorderStyle.FixedSingle;
             pbAlbum.Location = new Point(12, 28);
@@ -436,7 +443,7 @@
             tsmiQueuePlay.Name = "tsmiQueuePlay";
             tsmiQueuePlay.Size = new Size(184, 22);
             tsmiQueuePlay.Text = "Play";
-            tsmiQueuePlay.Click += lbList_DoubleClick;
+            tsmiQueuePlay.Click += tsmiQueuePlay_Click;
             // 
             // tsmiQueuePlayNext
             // 
@@ -482,15 +489,6 @@
             nudVolume.Value = new decimal(new int[] { 100, 0, 0, 0 });
             nudVolume.ValueChanged += nudVolume_ValueChanged;
             nudVolume.MouseUp += nudVolume_MouseClick;
-            // 
-            // ofdAddSong
-            // 
-            ofdAddSong.DefaultExt = "mp3";
-            ofdAddSong.Filter = "MP3 files|*.mp3";
-            ofdAddSong.InitialDirectory = "E:\\Dokumenty Vojta\\Hudba";
-            ofdAddSong.Multiselect = true;
-            ofdAddSong.RestoreDirectory = true;
-            ofdAddSong.Title = "Add Song...";
             // 
             // tDuration
             // 
@@ -573,7 +571,6 @@
         private ToolStripSeparator tssAdd1;
         private ToolStripMenuItem tsmiOpenLastSession;
         private ToolTip toolTip;
-        private OpenFileDialog ofdAddSong;
         private ToolStripSeparator tssAdd2;
         private ToolStripMenuItem tsmiCleanPlaylist;
         private ToolStripMenuItem tsmiCleanQueue;
@@ -591,5 +588,6 @@
         private ToolStripMenuItem tsmiRemoveFromQueue;
         private System.Windows.Forms.Timer tDuration;
         private System.Windows.Forms.Timer tControls;
+        private ToolStripMenuItem saveSessionToolStripMenuItem;
     }
 }
