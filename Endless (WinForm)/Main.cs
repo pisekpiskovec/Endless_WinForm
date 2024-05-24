@@ -57,7 +57,6 @@ namespace Endless__WinForm_
             openFileDialog.DefaultExt = "mp3";
             openFileDialog.Multiselect = true;
             openFileDialog.RestoreDirectory = true;
-            openFileDialog.InitialDirectory = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyMusic);
 
             try
             {
