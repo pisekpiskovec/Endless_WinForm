@@ -380,6 +380,7 @@
             lbList.ContextMenuStrip = cmsPlaylist;
             lbList.Dock = DockStyle.Fill;
             lbList.FormattingEnabled = true;
+            lbList.HorizontalScrollbar = true;
             lbList.ItemHeight = 15;
             lbList.Location = new Point(0, 0);
             lbList.Name = "lbList";
@@ -433,6 +434,7 @@
             lbQueue.ContextMenuStrip = cmsQueue;
             lbQueue.Dock = DockStyle.Fill;
             lbQueue.FormattingEnabled = true;
+            lbQueue.HorizontalScrollbar = true;
             lbQueue.ItemHeight = 15;
             lbQueue.Location = new Point(0, 0);
             lbQueue.Name = "lbQueue";
@@ -443,7 +445,7 @@
             // 
             cmsQueue.Items.AddRange(new ToolStripItem[] { tsmiQueuePlay, tsmiQueuePlayNext, tssQueue, tsmiMoveUp, tsmiMoveDown, tsmiRemoveFromQueue, tsmiQueueCleanQueue });
             cmsQueue.Name = "cmsQueue";
-            cmsQueue.Size = new Size(185, 164);
+            cmsQueue.Size = new Size(185, 142);
             cmsQueue.Text = "Queue Item";
             toolTip.SetToolTip(cmsQueue, "Queue Item");
             // 

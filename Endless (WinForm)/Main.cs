@@ -7,32 +7,46 @@ namespace Endless__WinForm_
 {
     public partial class Main : Form
     {
-        BindingList<string> playlist = new BindingList<string>();
-        BindingList<string> queue = new BindingList<string>();
+        BindingList<musItem> playlist = new BindingList<musItem>();
+        BindingList<musItem> queue = new BindingList<musItem>();
         Panel panelMPV = new Panel();
         MpvPlayer player;
         bool isMediaLoaded = false, isMediaPlaying = false;
         string mediaPath;
         int saveLocalVolume = 0, queueIndex = 0;
-        TagLib.File musFile;
 
         public Main()
         {
             InitializeComponent();
             lbList.DataSource = playlist;
+            lbList.DisplayMember = "Display";
             lbQueue.DataSource = queue;
+            lbQueue.DisplayMember = "Display";
             player = new MpvPlayer(panelMPV.Handle);
             player.Volume = 100;
         }
 
-        private void fileLoad(string FileName, BindingList<string> list)
+        private void fileLoad(string FileName, BindingList<musItem> list)
         {
             if (Path.GetExtension(FileName) == ".m3u")
             {
                 string[] inputing = System.IO.File.ReadAllLines(FileName);
                 foreach (string item in inputing) { fileLoad(item, list); }
             }
-            else if (Path.GetExtension(FileName) == ".mp3") { list.Add(FileName); }
+            else if (Path.GetExtension(FileName) == ".mp3") {
+                musItem newItem = new musItem();
+                TagLib.File musFile = TagLib.File.Create(FileName);
+                if (musFile.Tag.Pictures.Length > 0) { newItem.Image = Image.FromStream(new MemoryStream(musFile.Tag.Pictures[0].Data.Data)); }
+                newItem.Title = musFile.Tag.Title;
+                newItem.Artist = string.Join("; ", musFile.Tag.Performers);
+                newItem.Album = musFile.Tag.Album;
+                newItem.Artists = musFile.Tag.Performers;
+                newItem.Track = musFile.Tag.Track;
+                newItem.Disc = musFile.Tag.Disc;
+                newItem.Year = musFile.Tag.Year;
+                newItem.Path = FileName;
+                list.Add(newItem); 
+            }
         }
 
         private void tsmiAddSong_Click(object sender, EventArgs e)
@@ -54,15 +68,15 @@ namespace Endless__WinForm_
             catch { MessageBox.Show("Opening dialog failed. Please try again.", "Opening dialog failed", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
 
-        private void lbList_DoubleClick(object sender, EventArgs e) { if (playlist.Count > 0) loadMedia(lbList.Text); }
-        private void tsmiQueuePlay_Click(object sender, EventArgs e) { if (queue.Count > 0) loadMedia(lbQueue.Text, false); }
-        public void loadMedia(string path, bool addToQueue = true)
+        private void lbList_DoubleClick(object sender, EventArgs e) { if (playlist.Count > 0) loadMedia(playlist[lbList.SelectedIndex]); }
+        private void tsmiQueuePlay_Click(object sender, EventArgs e) { if (queue.Count > 0) loadMedia(queue[lbQueue.SelectedIndex], false); }
+        public void loadMedia(musItem item, bool addToQueue = true)
         {
-            player.Load(path);
-            mediaPath = path;
+            player.Load(item.Path);
+            mediaPath = item.Path;
             if (addToQueue)
             {
-                queue.Add(path);
+                queue.Add(item);
                 queueIndex = queue.Count - 1;
                 lbQueue.SelectedIndex = queueIndex;
             }
@@ -71,15 +85,14 @@ namespace Endless__WinForm_
             isMediaPlaying = true;
             tDuration.Start();
 
-            musFile = TagLib.File.Create(path);
-            if (musFile.Tag.Pictures.Length > 0) { pbAlbum.BackgroundImage = Image.FromStream(new MemoryStream(musFile.Tag.Pictures[0].Data.Data)); }
-            else { pbAlbum.BackgroundImage = Resources.generic_music_file_100px; }
-            lTitle.Text = musFile.Tag.Title;
-            lArtist.Text = string.Join("; ", musFile.Tag.Performers);
+            pbAlbum.BackgroundImage = item.Image;
+            lTitle.Text = item.Title;
+            lArtist.Text = item.Artist;
+            lAlbum.Text = item.Album;
             lNumbers.Text = string.Empty;
-            lNumbers.Text = (musFile.Tag.Track.ToString() ?? "0") + "/";
-            lNumbers.Text += (musFile.Tag.Disc.ToString() ?? "0") + "/";
-            lNumbers.Text += (musFile.Tag.Year.ToString() ?? "0000");
+            lNumbers.Text = (item.Track.ToString() ?? "0") + "/";
+            lNumbers.Text += (item.Disc.ToString() ?? "0") + "/";
+            lNumbers.Text += (item.Year.ToString() ?? "0000");
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e) { player.Dispose(); }
@@ -108,7 +121,7 @@ namespace Endless__WinForm_
             tsbStop.Enabled = isMediaLoaded;
             tsbSeekForward.Enabled = player.Duration.TotalSeconds - player.Position.TotalSeconds >= 10;
             tsbNext.Enabled = isMediaLoaded;
-            this.Text = isMediaLoaded ? "Endless | " + player.MediaTitle : "Endless";
+            this.Text = isMediaLoaded ? "Endless | " + queue[queueIndex].Display : "Endless";
             tsmiPlaylistCleanPlaylist.Enabled = playlist.Count > 0;
             tsmiPlaylistPlay.Enabled = playlist.Count > 0;
             tsmiPlaylistPlayNext.Enabled = playlist.Count > 0;
@@ -128,8 +141,8 @@ namespace Endless__WinForm_
             else if (queueIndex != 0)
             {
                 player.Stop(); isMediaPlaying = false; isMediaLoaded = false; mediaPath = ""; queueIndex--;
-                player.Load(queue[queueIndex]);
-                mediaPath = queue[queueIndex];
+                player.Load(queue[queueIndex].Path);
+                mediaPath = queue[queueIndex].Path;
                 isMediaLoaded = true;
                 player.Resume();
                 isMediaPlaying = true;
@@ -147,8 +160,8 @@ namespace Endless__WinForm_
             if (queueIndex != queue.Count - 1)
             {
                 player.Stop(); isMediaPlaying = false; isMediaLoaded = false; mediaPath = ""; queueIndex++;
-                player.Load(queue[queueIndex]);
-                mediaPath = queue[queueIndex];
+                player.Load(queue[queueIndex].Path);
+                mediaPath = queue[queueIndex].Path;
                 isMediaLoaded = true;
                 player.Resume();
                 isMediaPlaying = true;
@@ -170,7 +183,7 @@ namespace Endless__WinForm_
         private void tsmiCleanPlaylist_Click(object sender, EventArgs e) { playlist.Clear(); }
         private void tsmiSavePlaylist_Click(object sender, EventArgs e) { listSave(playlist); }
         private void tsmiSaveQueue_Click(object sender, EventArgs e) { listSave(queue); }
-        private void listSave(BindingList<string> list)
+        private void listSave(BindingList<musItem> list)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "M3U|*.m3u";
@@ -178,7 +191,7 @@ namespace Endless__WinForm_
             {
                 if (saveFileDialog.ShowDialog() == DialogResult.OK && saveFileDialog.FileName != string.Empty)
                 {
-                    System.IO.File.WriteAllLines(saveFileDialog.FileName, list.ToArray());
+                    System.IO.File.WriteAllLines(saveFileDialog.FileName, list.MusicListToArray());
                 }
             }
             catch { MessageBox.Show("Opening dialog failed. Please try again.", "Opening dialog failed", MessageBoxButtons.OK, MessageBoxIcon.Error); }
@@ -194,8 +207,8 @@ namespace Endless__WinForm_
 
             if (!Directory.Exists(sessionDir)) Directory.CreateDirectory(sessionDir);
 
-            System.IO.File.WriteAllLines(Path.Combine(playlistFile), playlist.ToArray());
-            System.IO.File.WriteAllLines(Path.Combine(queueFile), queue.ToArray());
+            System.IO.File.WriteAllLines(Path.Combine(playlistFile), playlist.MusicListToArray());
+            System.IO.File.WriteAllLines(Path.Combine(queueFile), queue.MusicListToArray());
         }
 
         private void tsmiOpenPlaylist_Click(object sender, EventArgs e)
@@ -253,11 +266,11 @@ namespace Endless__WinForm_
             }
         }
 
-        private void playNext(BindingList<string> list, ListBox listBox)
+        private void playNext(BindingList<musItem> list, ListBox listBox)
         {
             if (list.Count > 0)
             {
-                queue.Insert(queueIndex + 1, listBox.Text);
+                queue.Insert(queueIndex + 1, list[listBox.SelectedIndex]);
             }
         }
 
@@ -280,5 +293,30 @@ namespace Endless__WinForm_
                 list.Insert(newIndex, item);
             }
         }
+
+        public static string[] MusicListToArray(this BindingList<musItem> list)
+        {
+            string[] result = new string[list.Count];
+            for (int i = 0; i < list.Count; i++)
+            {
+                result[i] = list[i].Path;
+            }
+            return result;
+        }
+    }
+
+    public class musItem
+    {
+        public string Path { get; set; } = string.Empty;
+        public string Artist { get; set; } = string.Empty;
+        public string[] Artists { get; set; } = new string[0];
+        public string Title { get; set; } = string.Empty;
+        public string Album {  get; set; } = string.Empty;
+        public uint Track { get; set; } = 0;
+        public uint Disc { get; set; } = 0;
+        public uint Year { get; set; } = 0;
+        public Image Image { get; set; } = Resources.generic_music_file_100px;
+        private string Unknown = "Unknown";
+        public string Display { get { return $"{Artists[0] ?? Unknown} - {Title ?? Unknown} - {Album ?? Unknown}"; } }
     }
 }
