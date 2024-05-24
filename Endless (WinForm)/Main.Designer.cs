@@ -81,6 +81,8 @@
             toolTip = new ToolTip(components);
             tDuration = new System.Windows.Forms.Timer(components);
             tControls = new System.Windows.Forms.Timer(components);
+            cmsSettings = new ContextMenuStrip(components);
+            restoreLastSessionToolStripMenuItem = new ToolStripMenuItem();
             tsTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbAlbum).BeginInit();
             ((System.ComponentModel.ISupportInitialize)tbPosition).BeginInit();
@@ -91,6 +93,7 @@
             cmsPlaylist.SuspendLayout();
             cmsQueue.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudVolume).BeginInit();
+            cmsSettings.SuspendLayout();
             SuspendLayout();
             // 
             // tsTop
@@ -300,6 +303,7 @@
             tslDuration.Size = new Size(66, 22);
             tslDuration.Text = "00:00/00:00";
             tslDuration.ToolTipText = "Click to open Settings.";
+            tslDuration.MouseUp += tslDuration_MouseUp;
             // 
             // pbAlbum
             // 
@@ -519,6 +523,21 @@
             tControls.Interval = 750;
             tControls.Tick += tControls_Tick;
             // 
+            // cmsSettings
+            // 
+            cmsSettings.Items.AddRange(new ToolStripItem[] { restoreLastSessionToolStripMenuItem });
+            cmsSettings.Name = "cmsSettings";
+            cmsSettings.Size = new Size(185, 26);
+            // 
+            // restoreLastSessionToolStripMenuItem
+            // 
+            restoreLastSessionToolStripMenuItem.Checked = true;
+            restoreLastSessionToolStripMenuItem.CheckOnClick = true;
+            restoreLastSessionToolStripMenuItem.CheckState = CheckState.Checked;
+            restoreLastSessionToolStripMenuItem.Name = "restoreLastSessionToolStripMenuItem";
+            restoreLastSessionToolStripMenuItem.Size = new Size(184, 22);
+            restoreLastSessionToolStripMenuItem.Text = "Restore Last Session?";
+            // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -551,6 +570,7 @@
             cmsPlaylist.ResumeLayout(false);
             cmsQueue.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)nudVolume).EndInit();
+            cmsSettings.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -609,5 +629,7 @@
         private ToolStripMenuItem saveSessionToolStripMenuItem;
         private ToolStripMenuItem tsmiPlaylistCleanPlaylist;
         private ToolStripMenuItem tsmiQueueCleanQueue;
+        private ContextMenuStrip cmsSettings;
+        private ToolStripMenuItem restoreLastSessionToolStripMenuItem;
     }
 }

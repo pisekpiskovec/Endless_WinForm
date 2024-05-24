@@ -33,7 +33,8 @@ namespace Endless__WinForm_
                 string[] inputing = System.IO.File.ReadAllLines(FileName);
                 foreach (string item in inputing) { fileLoad(item, list); }
             }
-            else if (Path.GetExtension(FileName) == ".mp3") {
+            else if (Path.GetExtension(FileName) == ".mp3")
+            {
                 musItem newItem = new musItem();
                 TagLib.File musFile = TagLib.File.Create(FileName);
                 if (musFile.Tag.Pictures.Length > 0) { newItem.Image = Image.FromStream(new MemoryStream(musFile.Tag.Pictures[0].Data.Data)); }
@@ -45,7 +46,7 @@ namespace Endless__WinForm_
                 newItem.Disc = musFile.Tag.Disc;
                 newItem.Year = musFile.Tag.Year;
                 newItem.Path = FileName;
-                list.Add(newItem); 
+                list.Add(newItem);
             }
         }
 
@@ -277,8 +278,18 @@ namespace Endless__WinForm_
         private void tsmiQueuePlayNext_Click(object sender, EventArgs e) { playNext(queue, lbQueue); }
         private void tsmiRemoveFromPlaylist_Click(object sender, EventArgs e) { playlist.RemoveAt(lbList.SelectedIndex); }
         private void tsmiRemoveFromQueue_Click(object sender, EventArgs e) { queue.RemoveAt(lbQueue.SelectedIndex); }
-        private void tsmiMoveUp_Click(object sender, EventArgs e) { queue.Move(lbQueue.SelectedIndex, lbQueue.SelectedIndex-1); }
+        private void tsmiMoveUp_Click(object sender, EventArgs e) { queue.Move(lbQueue.SelectedIndex, lbQueue.SelectedIndex - 1); }
         private void tsmiMoveDown_Click(object sender, EventArgs e) { queue.Move(lbQueue.SelectedIndex, lbQueue.SelectedIndex + 1); }
+
+        private void tslDuration_MouseUp(object sender, MouseEventArgs e)
+        {
+            switch (e.Button)
+            {
+                case MouseButtons.Right:
+                    cmsSettings.Show(PointToScreen(new Point(tslDuration.Bounds.Location.X, tslDuration.Bounds.Location.Y + tslDuration.Bounds.Size.Height)));
+                    break;
+            }
+        }
     }
 
     public static class Listing
