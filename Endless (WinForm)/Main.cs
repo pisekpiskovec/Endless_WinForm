@@ -88,8 +88,8 @@ namespace Endless__WinForm_
         private void tDuration_Tick(object sender, EventArgs e)
         {
             tbPosition.Maximum = (int)player.Duration.TotalSeconds;
-            string hoursPosition = null;
-            string hoursTotal = null;
+            string hoursPosition = string.Empty;
+            string hoursTotal = string.Empty;
             if (player.Duration.Hours.ToString("00") != "00") { hoursPosition = player.Position.Hours.ToString("00") + ":"; };
             if (player.Duration.Hours.ToString("00") != "00") { hoursTotal = player.Duration.Hours.ToString("00") + ":"; };
             tslDuration.Text = $"{hoursPosition}{player.Position.Minutes:00}:{player.Position.Seconds:00}/{hoursTotal}{player.Duration.Minutes:00}:{player.Duration.Seconds:00}";
