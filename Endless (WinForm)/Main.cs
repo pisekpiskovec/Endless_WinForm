@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.IO;
 using Endless_WinForm.Properties;
 using Mpv.NET.Player;
 
@@ -12,7 +11,7 @@ namespace Endless__WinForm_
         Panel panelMPV = new Panel();
         MpvPlayer player;
         bool isMediaLoaded = false, isMediaPlaying = false;
-        string mediaPath;
+        string mediaPath = String.Empty;
         int saveLocalVolume = 0, queueIndex = 0;
 
         public Main()
