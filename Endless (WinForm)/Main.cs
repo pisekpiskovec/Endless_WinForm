@@ -23,7 +23,10 @@ namespace Endless__WinForm_
             lbQueue.DataSource = queue;
             lbQueue.DisplayMember = "Display";
             player = new MpvPlayer(panelMPV.Handle);
-            player.Volume = 100;
+            player.Volume = Settings.Default.sessionLoadLast ? Settings.Default.volumeLast : 100;
+            nudVolume.Value = player.Volume;
+            tsmiRestoreSession.Checked = Settings.Default.sessionLoadLast;
+            if (Settings.Default.sessionLoadLast) tsmiOpenLastSession.PerformClick();
         }
 
         private void fileLoad(string FileName, BindingList<musItem> list)
@@ -95,7 +98,13 @@ namespace Endless__WinForm_
             lNumbers.Text += (item.Year.ToString() ?? "0000");
         }
 
-        private void Main_FormClosing(object sender, FormClosingEventArgs e) { player.Dispose(); }
+        private void Main_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            tControls.Stop(); tDuration.Stop(); player.Dispose();
+            if (Settings.Default.sessionLoadLast) tsmiSaveSession.PerformClick();
+            Settings.Default.Save();
+        }
+
         private void nudVolume_ValueChanged(object sender, EventArgs e) { player.Volume = (int)nudVolume.Value; }
         private void nudVolume_MouseClick(object sender, MouseEventArgs e) { if (e.Button == MouseButtons.Middle) { if (player.Volume == 0) { player.Volume = saveLocalVolume; } else { saveLocalVolume = player.Volume; player.Volume = 0; } } }
         private void tDuration_Tick(object sender, EventArgs e)
@@ -197,7 +206,7 @@ namespace Endless__WinForm_
             catch { MessageBox.Show("Opening dialog failed. Please try again.", "Opening dialog failed", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
 
-        private void saveSessionToolStripMenuItem_Click(object sender, EventArgs e)
+        private void tsmiSaveSession_Click(object sender, EventArgs e)
         {
             string[] sessionDirParts = { Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "Endless" };
             string sessionDir = Path.Combine(sessionDirParts);
@@ -207,8 +216,11 @@ namespace Endless__WinForm_
 
             if (!Directory.Exists(sessionDir)) Directory.CreateDirectory(sessionDir);
 
-            System.IO.File.WriteAllLines(Path.Combine(playlistFile), playlist.MusicListToArray());
-            System.IO.File.WriteAllLines(Path.Combine(queueFile), queue.MusicListToArray());
+            System.IO.File.Delete(Path.Combine(playlistFile));
+            System.IO.File.Delete(Path.Combine(queueFile));
+
+            try { System.IO.File.WriteAllLines(Path.Combine(playlistFile), playlist.MusicListToArray()); } catch { MessageBox.Show("Could not edit the file", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            try { System.IO.File.WriteAllLines(Path.Combine(queueFile), queue.MusicListToArray()); } catch { MessageBox.Show("Could not edit the file", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private void tsmiOpenPlaylist_Click(object sender, EventArgs e)
@@ -290,6 +302,9 @@ namespace Endless__WinForm_
                     break;
             }
         }
+
+        private void tsmiRestoreSession_CheckedChanged(object sender, EventArgs e) { Settings.Default.sessionLoadLast = tsmiRestoreSession.Checked; }
+
     }
 
     public static class Listing
