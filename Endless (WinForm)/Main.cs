@@ -230,20 +230,26 @@ namespace Endless__WinForm_
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "M3U|*.m3u";
-            StreamReader reader = new StreamReader(openFileDialog.FileName, System.Text.Encoding.Default);
-            string[] inputing = reader.ReadToEnd().Split('\n');
-            foreach (string input in inputing) fileLoad(input, playlist);
-            reader.Close();
+            if(openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                StreamReader reader = new StreamReader(openFileDialog.FileName, System.Text.Encoding.Default);
+                string[] inputing = reader.ReadToEnd().Split('\n');
+                foreach (string input in inputing) fileLoad(input, playlist);
+                reader.Close();
+            }
         }
 
         private void tsmiOpenQueue_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "M3U|*.m3u";
-            StreamReader reader = new StreamReader(openFileDialog.FileName, System.Text.Encoding.Default);
-            string[] inputing = reader.ReadToEnd().Split('\n');
-            foreach (string input in inputing) fileLoad(input, queue);
-            reader.Close();
+            if(openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                StreamReader reader = new StreamReader(openFileDialog.FileName, System.Text.Encoding.Default);
+                string[] inputing = reader.ReadToEnd().Split('\n');
+                foreach (string input in inputing) fileLoad(input, queue);
+                reader.Close();
+            }
         }
 
         private void tsmiOpenLastSession_Click(object sender, EventArgs e)
