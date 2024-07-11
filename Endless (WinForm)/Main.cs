@@ -216,11 +216,15 @@ namespace Endless__WinForm_
 
             if (!Directory.Exists(sessionDir)) Directory.CreateDirectory(sessionDir);
 
-            System.IO.File.Delete(Path.Combine(playlistFile));
-            System.IO.File.Delete(Path.Combine(queueFile));
+            StreamWriter writer;
 
-            try { System.IO.File.WriteAllLines(Path.Combine(playlistFile), playlist.MusicListToArray()); } catch { MessageBox.Show("Could not edit the file", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
-            try { System.IO.File.WriteAllLines(Path.Combine(queueFile), queue.MusicListToArray()); } catch { MessageBox.Show("Could not edit the file", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            writer = new StreamWriter(Path.Combine(playlistFile), false, System.Text.Encoding.UTF8);
+            for (int i = 0; i < playlist.Count; i++) { writer.WriteLine(playlist[i]); }
+            writer.Close();
+
+            writer = new StreamWriter(Path.Combine(queueFile), false, System.Text.Encoding.UTF8);
+            for (int i = 0; i < queue.Count; i++) { writer.WriteLine(queue[i]); }
+            writer.Close();
         }
 
         private void tsmiOpenPlaylist_Click(object sender, EventArgs e)
@@ -267,6 +271,7 @@ namespace Endless__WinForm_
                 str = str.Replace("\r", string.Empty);
                 fileLoad(str, playlist);
             }
+            reader.Close();
 
             reader = new StreamReader(Path.Combine(queueFile), System.Text.Encoding.Default);
             inputing = reader.ReadToEnd().Split('\n');
@@ -276,6 +281,7 @@ namespace Endless__WinForm_
                 str = str.Replace("\r", string.Empty);
                 fileLoad(str, queue);
             }
+            reader.Close();
         }
 
         private void playNext(BindingList<musItem> list, ListBox listBox)
