@@ -233,6 +233,7 @@ namespace Endless__WinForm_
             StreamReader reader = new StreamReader(openFileDialog.FileName, System.Text.Encoding.Default);
             string[] inputing = reader.ReadToEnd().Split('\n');
             foreach (string input in inputing) fileLoad(input, playlist);
+            reader.Close();
         }
 
         private void tsmiOpenQueue_Click(object sender, EventArgs e)
@@ -242,15 +243,13 @@ namespace Endless__WinForm_
             StreamReader reader = new StreamReader(openFileDialog.FileName, System.Text.Encoding.Default);
             string[] inputing = reader.ReadToEnd().Split('\n');
             foreach (string input in inputing) fileLoad(input, queue);
+            reader.Close();
         }
 
         private void tsmiOpenLastSession_Click(object sender, EventArgs e)
         {
             string[] sessionDirParts = { Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "Endless" };
             string sessionDir = Path.Combine(sessionDirParts);
-
-            string[] playlistFile = { sessionDir, "playlist.m3u" };
-            string[] queueFile = { sessionDir, "queue.m3u" };
 
             if (!Directory.Exists(sessionDir))
             {
@@ -259,10 +258,20 @@ namespace Endless__WinForm_
                 return;
             }
 
+            string[] playlistFileParts = { sessionDir, "playlist.m3u" };
+            string[] queueFileParts = { sessionDir, "queue.m3u" };
+            string playlistFile = Path.Combine(playlistFileParts), queueFile = Path.Combine(queueFileParts);
+
+            if (!File.Exists(playlistFile) || !File.Exists(queueFile))
+            {
+                MessageBox.Show("Saved session's files eiter don't exsists or are corrupted.", "Can't load last session!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             StreamReader reader;
             string[] inputing;
 
-            reader = new StreamReader(Path.Combine(playlistFile), System.Text.Encoding.Default);
+            reader = new StreamReader(playlistFile, System.Text.Encoding.UTF8);
             inputing = reader.ReadToEnd().Split('\n');
             for (int i = 0; i < inputing.Length - 1; i++)
             {
@@ -272,7 +281,7 @@ namespace Endless__WinForm_
             }
             reader.Close();
 
-            reader = new StreamReader(Path.Combine(queueFile), System.Text.Encoding.Default);
+            reader = new StreamReader(queueFile, System.Text.Encoding.UTF8);
             inputing = reader.ReadToEnd().Split('\n');
             for (int i = 0; i < inputing.Length - 1; i++)
             {
