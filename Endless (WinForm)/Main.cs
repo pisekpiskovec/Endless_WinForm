@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using Endless_WinForm.Properties;
 using Mpv.NET.Player;
 
@@ -210,20 +212,27 @@ namespace Endless__WinForm_
             string[] sessionDirParts = { Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "Endless" };
             string sessionDir = Path.Combine(sessionDirParts);
 
-            string[] playlistFile = { sessionDir, "playlist.m3u" };
-            string[] queueFile = { sessionDir, "queue.m3u" };
+            string[] playlistFileParts = { sessionDir, "playlist.m3u" };
+            string[] queueFileParts = { sessionDir, "queue.m3u" };
+            string playlistFile = Path.Combine(playlistFileParts), queueFile = Path.Combine(queueFileParts);
 
-            if (!Directory.Exists(sessionDir)) Directory.CreateDirectory(sessionDir);
+            if (!Directory.Exists(sessionDir)) {
+                Directory.CreateDirectory(sessionDir);
+                DirectoryInfo info = new DirectoryInfo(sessionDir);
+                ClearReadOnlyFlag(info);
+            }
 
             StreamWriter writer;
 
-            writer = new StreamWriter(Path.Combine(playlistFile), false, System.Text.Encoding.UTF8);
-            for (int i = 0; i < playlist.Count; i++) { writer.WriteLine(playlist[i]); }
+            writer = new StreamWriter(playlistFile, false, System.Text.Encoding.UTF8);
+            for (int i = 0; i < playlist.Count; i++) { writer.WriteLine(playlist[i].Path); }
             writer.Close();
+            File.SetAttributes(playlistFile, FileAttributes.Normal);
 
-            writer = new StreamWriter(Path.Combine(queueFile), false, System.Text.Encoding.UTF8);
-            for (int i = 0; i < queue.Count; i++) { writer.WriteLine(queue[i]); }
+            writer = new StreamWriter(queueFile, false, System.Text.Encoding.UTF8);
+            for (int i = 0; i < queue.Count; i++) { writer.WriteLine(queue[i].Path); }
             writer.Close();
+            File.SetAttributes(queueFile, FileAttributes.Normal);
         }
 
         private void tsmiOpenPlaylist_Click(object sender, EventArgs e)
@@ -234,7 +243,11 @@ namespace Endless__WinForm_
             {
                 StreamReader reader = new StreamReader(openFileDialog.FileName, System.Text.Encoding.Default);
                 string[] inputing = reader.ReadToEnd().Split('\n');
-                foreach (string input in inputing) fileLoad(input, playlist);
+                foreach (string input in inputing) {
+                    string str = input;
+                    str = str.Replace("\r", string.Empty);
+                    fileLoad(str, playlist);
+                }
                 reader.Close();
             }
         }
@@ -247,7 +260,11 @@ namespace Endless__WinForm_
             {
                 StreamReader reader = new StreamReader(openFileDialog.FileName, System.Text.Encoding.Default);
                 string[] inputing = reader.ReadToEnd().Split('\n');
-                foreach (string input in inputing) fileLoad(input, queue);
+                foreach (string input in inputing) {
+                    string str = input;
+                    str = str.Replace("\r", string.Empty);
+                    fileLoad(str, playlist);
+                }
                 reader.Close();
             }
         }
@@ -260,6 +277,15 @@ namespace Endless__WinForm_
             if (!Directory.Exists(sessionDir))
             {
                 Directory.CreateDirectory(sessionDir);
+                DirectoryInfo info = new DirectoryInfo(sessionDir);
+                DirectorySecurity security = info.GetAccessControl();
+                security.AddAccessRule(new FileSystemAccessRule(
+                    new NTAccount(System.Security.Principal.WindowsIdentity.GetCurrent().Name),
+                    FileSystemRights.FullControl,
+                    InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+                    PropagationFlags.None,
+                    AccessControlType.Allow));
+                info.SetAccessControl(security);
                 MessageBox.Show("Saved session's files eiter don't exsists or are corrupted.", "Can't load last session!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
@@ -324,7 +350,13 @@ namespace Endless__WinForm_
         }
 
         private void tsmiRestoreSession_CheckedChanged(object sender, EventArgs e) { Settings.Default.sessionLoadLast = tsmiRestoreSession.Checked; }
-
+        private void ClearReadOnlyFlag(DirectoryInfo parentDirectory)
+        {
+            if (parentDirectory == null) return;
+            parentDirectory.Attributes = FileAttributes.Normal;
+            foreach (FileInfo fi in parentDirectory.GetFiles()) fi.Attributes = FileAttributes.Normal;
+            foreach (DirectoryInfo di in parentDirectory.GetDirectories()) ClearReadOnlyFlag(di);
+        }
     }
 
     public static class Listing
