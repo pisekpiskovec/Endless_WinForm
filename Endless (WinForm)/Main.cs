@@ -216,11 +216,7 @@ namespace Endless__WinForm_
             string[] queueFileParts = { sessionDir, "queue.m3u" };
             string playlistFile = Path.Combine(playlistFileParts), queueFile = Path.Combine(queueFileParts);
 
-            if (!Directory.Exists(sessionDir)) {
-                Directory.CreateDirectory(sessionDir);
-                DirectoryInfo info = new DirectoryInfo(sessionDir);
-                ClearReadOnlyFlag(info);
-            }
+            CreateFolder(sessionDir);
 
             StreamWriter writer;
 
@@ -276,16 +272,7 @@ namespace Endless__WinForm_
 
             if (!Directory.Exists(sessionDir))
             {
-                Directory.CreateDirectory(sessionDir);
-                DirectoryInfo info = new DirectoryInfo(sessionDir);
-                DirectorySecurity security = info.GetAccessControl();
-                security.AddAccessRule(new FileSystemAccessRule(
-                    new NTAccount(System.Security.Principal.WindowsIdentity.GetCurrent().Name),
-                    FileSystemRights.FullControl,
-                    InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
-                    PropagationFlags.None,
-                    AccessControlType.Allow));
-                info.SetAccessControl(security);
+                CreateFolder(sessionDir);
                 MessageBox.Show("Saved session's files eiter don't exsists or are corrupted.", "Can't load last session!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
@@ -350,12 +337,22 @@ namespace Endless__WinForm_
         }
 
         private void tsmiRestoreSession_CheckedChanged(object sender, EventArgs e) { Settings.Default.sessionLoadLast = tsmiRestoreSession.Checked; }
-        private void ClearReadOnlyFlag(DirectoryInfo parentDirectory)
+        private void CreateFolder(string path)
         {
-            if (parentDirectory == null) return;
-            parentDirectory.Attributes = FileAttributes.Normal;
-            foreach (FileInfo fi in parentDirectory.GetFiles()) fi.Attributes = FileAttributes.Normal;
-            foreach (DirectoryInfo di in parentDirectory.GetDirectories()) ClearReadOnlyFlag(di);
+            if (string.IsNullOrEmpty(path)) return;
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+                DirectoryInfo info = new DirectoryInfo(path);
+                DirectorySecurity security = info.GetAccessControl();
+                security.AddAccessRule(new FileSystemAccessRule(
+                    new NTAccount(WindowsIdentity.GetCurrent().Name),
+                    FileSystemRights.FullControl,
+                    InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+                    PropagationFlags.None,
+                    AccessControlType.Allow));
+                info.SetAccessControl(security);
+            }
         }
     }
 
