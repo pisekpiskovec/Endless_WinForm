@@ -111,6 +111,7 @@ namespace Endless__WinForm_
             tControls.Stop(); tDuration.Stop(); player.Dispose();
             if (Settings.Default.sessionLoadLast) tsmiSaveSession.PerformClick();
             Settings.Default.Save();
+            ToastNotificationManagerCompat.Uninstall();
         }
 
         private void nudVolume_ValueChanged(object sender, EventArgs e) { player.Volume = (int)nudVolume.Value; }
