@@ -1,7 +1,9 @@
 using System.ComponentModel;
+using System.Drawing.Imaging;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using Endless_WinForm.Properties;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Mpv.NET.Player;
 
 namespace Endless__WinForm_
@@ -97,6 +99,11 @@ namespace Endless__WinForm_
             lNumbers.Text = (item.Track.ToString() ?? "0") + "/";
             lNumbers.Text += (item.Disc.ToString() ?? "0") + "/";
             lNumbers.Text += (item.Year.ToString() ?? "0000");
+            new ToastContentBuilder()
+                .AddText("Now playing:")
+                .AddText($"{string.Join(", ", item.Artists)}\n{item.Title}\n{item.Album}")
+                .AddHeroImage(Imaging.ImageToUri(item.Image))
+                .Show();
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
@@ -376,6 +383,17 @@ namespace Endless__WinForm_
                 result[i] = list[i].Path;
             }
             return result;
+        }
+    }
+
+    public static class Imaging
+    {
+        public static Uri ImageToUri(Image image)
+        {
+            string[] TempDirParts = { System.IO.Path.GetTempPath(), "endless.png" };
+            string TempDir = Path.Combine(TempDirParts[0], TempDirParts[1]);
+            image.Save(TempDir, ImageFormat.Png);
+            return new Uri(TempDir);
         }
     }
 

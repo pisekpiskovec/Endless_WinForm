@@ -2,7 +2,7 @@
 
 ## Todo
 * [ ] Tray icon
-* [ ] Notifications
+* [x] Notifications
 * [ ] Save/Load sessions
 * [ ] Looping
 * [ ] Random playback
