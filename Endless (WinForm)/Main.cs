@@ -247,11 +247,7 @@ namespace Endless__WinForm_
             {
                 StreamReader reader = new StreamReader(openFileDialog.FileName, System.Text.Encoding.Default);
                 string[] inputing = reader.ReadToEnd().Split('\n');
-                foreach (string input in inputing) {
-                    string str = input;
-                    str = str.Replace("\r", string.Empty);
-                    fileLoad(str, playlist);
-                }
+                foreach (string input in inputing) fileLoad(input.Replace("\r", string.Empty), playlist);
                 reader.Close();
             }
         }
@@ -264,11 +260,8 @@ namespace Endless__WinForm_
             {
                 StreamReader reader = new StreamReader(openFileDialog.FileName, System.Text.Encoding.Default);
                 string[] inputing = reader.ReadToEnd().Split('\n');
-                foreach (string input in inputing) {
-                    string str = input;
-                    str = str.Replace("\r", string.Empty);
-                    fileLoad(str, playlist);
-                }
+                foreach (string input in inputing) fileLoad(input.Replace("\r", string.Empty), queue);
+                    fileLoad(input.Replace("\r", string.Empty), queue);
                 reader.Close();
             }
         }
