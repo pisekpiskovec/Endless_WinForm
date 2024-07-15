@@ -1,7 +1,5 @@
 using System.ComponentModel;
 using System.Drawing.Imaging;
-using System.Security.AccessControl;
-using System.Security.Principal;
 using Endless_WinForm.Properties;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Mpv.NET.Player;
@@ -217,14 +215,14 @@ namespace Endless__WinForm_
 
         private void tsmiSaveSession_Click(object sender, EventArgs e)
         {
-            string[] sessionDirParts = { Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "Endless" };
+            string[] sessionDirParts = { Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Endless" };
             string sessionDir = Path.Combine(sessionDirParts);
 
             string[] playlistFileParts = { sessionDir, "playlist.m3u" };
             string[] queueFileParts = { sessionDir, "queue.m3u" };
             string playlistFile = Path.Combine(playlistFileParts), queueFile = Path.Combine(queueFileParts);
 
-            CreateFolder(sessionDir);
+            if (!Directory.Exists(sessionDir)) Directory.CreateDirectory(sessionDir);
 
             StreamWriter writer;
 
@@ -267,7 +265,7 @@ namespace Endless__WinForm_
 
         private void tsmiOpenLastSession_Click(object sender, EventArgs e)
         {
-            string[] sessionDirParts = { Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "Endless" };
+            string[] sessionDirParts = { Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Endless" };
             string sessionDir = Path.Combine(sessionDirParts);
 
             if (!Directory.Exists(sessionDir))
@@ -337,23 +335,6 @@ namespace Endless__WinForm_
         }
 
         private void tsmiRestoreSession_CheckedChanged(object sender, EventArgs e) { Settings.Default.sessionLoadLast = tsmiRestoreSession.Checked; }
-        private void CreateFolder(string path)
-        {
-            if (string.IsNullOrEmpty(path)) return;
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-                DirectoryInfo info = new DirectoryInfo(path);
-                DirectorySecurity security = info.GetAccessControl();
-                security.AddAccessRule(new FileSystemAccessRule(
-                    new NTAccount(WindowsIdentity.GetCurrent().Name),
-                    FileSystemRights.FullControl,
-                    InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
-                    PropagationFlags.None,
-                    AccessControlType.Allow));
-                info.SetAccessControl(security);
-            }
-        }
     }
 
     public static class Listing

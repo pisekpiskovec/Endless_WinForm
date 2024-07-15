@@ -3,7 +3,7 @@
 ## Todo
 * [ ] Tray icon
 * [x] Notifications
-* [ ] Save/Load sessions
+* [x] Save/Load sessions
 * [ ] Looping
 * [ ] Random playback
 * [ ] About
