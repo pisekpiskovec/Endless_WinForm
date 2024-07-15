@@ -270,7 +270,7 @@ namespace Endless__WinForm_
 
             if (!Directory.Exists(sessionDir))
             {
-                CreateFolder(sessionDir);
+                Directory.CreateDirectory(sessionDir);
                 MessageBox.Show("Saved session's files eiter don't exsists or are corrupted.", "Can't load last session!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
