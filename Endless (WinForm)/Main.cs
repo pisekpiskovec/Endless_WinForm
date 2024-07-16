@@ -215,7 +215,7 @@ namespace Endless__WinForm_
 
         private void tsmiSaveSession_Click(object sender, EventArgs e)
         {
-            string[] sessionDirParts = { Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Endless" };
+            string[] sessionDirParts = { Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Písek_Pískovec", "Endless_Data" };
             string sessionDir = Path.Combine(sessionDirParts);
 
             string[] playlistFileParts = { sessionDir, "playlist.m3u" };
@@ -265,7 +265,7 @@ namespace Endless__WinForm_
 
         private void tsmiOpenLastSession_Click(object sender, EventArgs e)
         {
-            string[] sessionDirParts = { Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Endless" };
+            string[] sessionDirParts = { Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Písek_Pískovec", "Endless_Data" };
             string sessionDir = Path.Combine(sessionDirParts);
 
             if (!Directory.Exists(sessionDir))
