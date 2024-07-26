@@ -1,6 +1,6 @@
 ﻿using Endless_WinForm.Properties;
 
-namespace Endless__WinForm_
+namespace Endless_WinForm
 {
     partial class Main
     {

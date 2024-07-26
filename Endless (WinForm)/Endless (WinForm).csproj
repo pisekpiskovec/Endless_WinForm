@@ -8,7 +8,7 @@
     <UseWindowsForms>True</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
-    <Version>0.2.0</Version>
+    <Version>0.4.0</Version>
     <Authors>Písek Pískovec</Authors>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>

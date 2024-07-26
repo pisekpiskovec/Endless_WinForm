@@ -4,7 +4,7 @@ using Endless_WinForm.Properties;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Mpv.NET.Player;
 
-namespace Endless__WinForm_
+namespace Endless_WinForm
 {
     public partial class Main : Form
     {

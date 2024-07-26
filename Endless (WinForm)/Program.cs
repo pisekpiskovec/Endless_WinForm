@@ -1,4 +1,4 @@
-namespace Endless__WinForm_
+namespace Endless_WinForm
 {
     internal static class Program
     {
