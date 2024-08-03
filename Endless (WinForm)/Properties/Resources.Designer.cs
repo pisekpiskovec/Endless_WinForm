@@ -123,6 +123,16 @@ namespace Endless_WinForm.Properties {
         /// <summary>
         ///   Vyhledává lokalizovaný prostředek typu System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap repeat_100px {
+            get {
+                object obj = ResourceManager.GetObject("repeat_100px", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Vyhledává lokalizovaný prostředek typu System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap rewind_96px {
             get {
                 object obj = ResourceManager.GetObject("rewind_96px", resourceCulture);
@@ -136,6 +146,16 @@ namespace Endless_WinForm.Properties {
         internal static System.Drawing.Bitmap save_96px {
             get {
                 object obj = ResourceManager.GetObject("save_96px", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Vyhledává lokalizovaný prostředek typu System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap shuffle_100px {
+            get {
+                object obj = ResourceManager.GetObject("shuffle_100px", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

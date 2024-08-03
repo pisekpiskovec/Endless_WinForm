@@ -56,6 +56,15 @@ namespace Endless_WinForm
             tsbNext = new ToolStripButton();
             tssBasic2 = new ToolStripSeparator();
             tslDuration = new ToolStripLabel();
+            tssBasic3 = new ToolStripSeparator();
+            tsddbQueueLooping = new ToolStripDropDownButton();
+            tsmiNoLoop = new ToolStripMenuItem();
+            tsmiLoopOne = new ToolStripMenuItem();
+            tsmiLoopPlaylist = new ToolStripMenuItem();
+            tsddbQueueRandom = new ToolStripDropDownButton();
+            tsmiNoRandom = new ToolStripMenuItem();
+            tsmiNormalRandom = new ToolStripMenuItem();
+            tsmiUniqueRandom = new ToolStripMenuItem();
             pbAlbum = new PictureBox();
             lTitle = new Label();
             lArtist = new Label();
@@ -79,12 +88,11 @@ namespace Endless_WinForm
             tsmiMoveDown = new ToolStripMenuItem();
             tsmiRemoveFromQueue = new ToolStripMenuItem();
             tsmiQueueCleanQueue = new ToolStripMenuItem();
-            nudVolume = new NumericUpDown();
             toolTip = new ToolTip(components);
-            tDuration = new System.Windows.Forms.Timer(components);
             tControls = new System.Windows.Forms.Timer(components);
             cmsSettings = new ContextMenuStrip(components);
             tsmiRestoreSession = new ToolStripMenuItem();
+            tbVolume = new TrackBar();
             tsTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbAlbum).BeginInit();
             ((System.ComponentModel.ISupportInitialize)tbPosition).BeginInit();
@@ -94,13 +102,13 @@ namespace Endless_WinForm
             splitContainer1.SuspendLayout();
             cmsPlaylist.SuspendLayout();
             cmsQueue.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)nudVolume).BeginInit();
             cmsSettings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)tbVolume).BeginInit();
             SuspendLayout();
             // 
             // tsTop
             // 
-            tsTop.Items.AddRange(new ToolStripItem[] { tssbAddSong, tssbSavePlaylist, tssBasic1, tsbPrevious, tsbSeekBack, tsbPlay, tsbPause, tsbStop, tsbSeekForward, tsbNext, tssBasic2, tslDuration });
+            tsTop.Items.AddRange(new ToolStripItem[] { tssbAddSong, tssbSavePlaylist, tssBasic1, tsbPrevious, tsbSeekBack, tsbPlay, tsbPause, tsbStop, tsbSeekForward, tsbNext, tssBasic2, tslDuration, tssBasic3, tsddbQueueLooping, tsddbQueueRandom });
             tsTop.Location = new Point(0, 0);
             tsTop.Name = "tsTop";
             tsTop.Size = new Size(511, 25);
@@ -193,21 +201,21 @@ namespace Endless_WinForm
             // tsmiSavePlaylist
             // 
             tsmiSavePlaylist.Name = "tsmiSavePlaylist";
-            tsmiSavePlaylist.Size = new Size(180, 22);
+            tsmiSavePlaylist.Size = new Size(140, 22);
             tsmiSavePlaylist.Text = "Save Playlist";
             tsmiSavePlaylist.Click += tsmiSavePlaylist_Click;
             // 
             // tsmiSaveQueue
             // 
             tsmiSaveQueue.Name = "tsmiSaveQueue";
-            tsmiSaveQueue.Size = new Size(180, 22);
+            tsmiSaveQueue.Size = new Size(140, 22);
             tsmiSaveQueue.Text = "Save Queue";
             tsmiSaveQueue.Click += tsmiSaveQueue_Click;
             // 
             // tsmiSaveSession
             // 
             tsmiSaveSession.Name = "tsmiSaveSession";
-            tsmiSaveSession.Size = new Size(180, 22);
+            tsmiSaveSession.Size = new Size(140, 22);
             tsmiSaveSession.Text = "Save Session";
             tsmiSaveSession.Click += tsmiSaveSession_Click;
             // 
@@ -307,6 +315,80 @@ namespace Endless_WinForm
             tslDuration.ToolTipText = "Click to open Settings.";
             tslDuration.MouseUp += tslDuration_MouseUp;
             // 
+            // tssBasic3
+            // 
+            tssBasic3.Name = "tssBasic3";
+            tssBasic3.Size = new Size(6, 25);
+            // 
+            // tsddbQueueLooping
+            // 
+            tsddbQueueLooping.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsddbQueueLooping.DropDownItems.AddRange(new ToolStripItem[] { tsmiNoLoop, tsmiLoopOne, tsmiLoopPlaylist });
+            tsddbQueueLooping.Image = Resources.repeat_100px;
+            tsddbQueueLooping.ImageTransparentColor = Color.Magenta;
+            tsddbQueueLooping.Name = "tsddbQueueLooping";
+            tsddbQueueLooping.Size = new Size(29, 22);
+            tsddbQueueLooping.Text = "Looping";
+            // 
+            // tsmiNoLoop
+            // 
+            tsmiNoLoop.Name = "tsmiNoLoop";
+            tsmiNoLoop.Size = new Size(141, 22);
+            tsmiNoLoop.Text = "No Looping";
+            tsmiNoLoop.Click += tsmiNoLoop_Click;
+            // 
+            // tsmiLoopOne
+            // 
+            tsmiLoopOne.Name = "tsmiLoopOne";
+            tsmiLoopOne.Size = new Size(141, 22);
+            tsmiLoopOne.Text = "Loop One";
+            tsmiLoopOne.Click += tsmiLoopOne_Click;
+            // 
+            // tsmiLoopPlaylist
+            // 
+            tsmiLoopPlaylist.Checked = true;
+            tsmiLoopPlaylist.CheckState = CheckState.Checked;
+            tsmiLoopPlaylist.Name = "tsmiLoopPlaylist";
+            tsmiLoopPlaylist.Size = new Size(141, 22);
+            tsmiLoopPlaylist.Text = "Loop Playlist";
+            tsmiLoopPlaylist.Click += tsmiLoopPlaylist_Click;
+            // 
+            // tsddbQueueRandom
+            // 
+            tsddbQueueRandom.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsddbQueueRandom.DropDownItems.AddRange(new ToolStripItem[] { tsmiNoRandom, tsmiNormalRandom, tsmiUniqueRandom });
+            tsddbQueueRandom.Image = Resources.shuffle_100px;
+            tsddbQueueRandom.ImageTransparentColor = Color.Magenta;
+            tsddbQueueRandom.Name = "tsddbQueueRandom";
+            tsddbQueueRandom.Size = new Size(29, 22);
+            tsddbQueueRandom.Text = "Shuffle";
+            // 
+            // tsmiNoRandom
+            // 
+            tsmiNoRandom.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            tsmiNoRandom.Name = "tsmiNoRandom";
+            tsmiNoRandom.Size = new Size(154, 22);
+            tsmiNoRandom.Text = "No Shuffle";
+            tsmiNoRandom.Click += tsmiNoRandom_Click;
+            // 
+            // tsmiNormalRandom
+            // 
+            tsmiNormalRandom.Checked = true;
+            tsmiNormalRandom.CheckState = CheckState.Checked;
+            tsmiNormalRandom.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            tsmiNormalRandom.Name = "tsmiNormalRandom";
+            tsmiNormalRandom.Size = new Size(154, 22);
+            tsmiNormalRandom.Text = "Normal Shuffle";
+            tsmiNormalRandom.Click += tsmiNormmalRandom_Click;
+            // 
+            // tsmiUniqueRandom
+            // 
+            tsmiUniqueRandom.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            tsmiUniqueRandom.Name = "tsmiUniqueRandom";
+            tsmiUniqueRandom.Size = new Size(154, 22);
+            tsmiUniqueRandom.Text = "Unique Shuffle";
+            tsmiUniqueRandom.Click += tsmiUniqueRandom_Click;
+            // 
             // pbAlbum
             // 
             pbAlbum.BackgroundImage = Resources.generic_music_file_100px;
@@ -320,38 +402,34 @@ namespace Endless_WinForm
             // 
             // lTitle
             // 
-            lTitle.AutoSize = true;
             lTitle.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 238);
             lTitle.Location = new Point(132, 28);
             lTitle.Name = "lTitle";
-            lTitle.Size = new Size(39, 21);
+            lTitle.Size = new Size(311, 21);
             lTitle.TabIndex = 4;
             lTitle.Text = "Title";
             // 
             // lArtist
             // 
-            lArtist.AutoSize = true;
             lArtist.Location = new Point(132, 49);
             lArtist.Name = "lArtist";
-            lArtist.Size = new Size(35, 15);
+            lArtist.Size = new Size(311, 15);
             lArtist.TabIndex = 5;
             lArtist.Text = "Artist";
             // 
             // lAlbum
             // 
-            lAlbum.AutoSize = true;
             lAlbum.Location = new Point(132, 64);
             lAlbum.Name = "lAlbum";
-            lAlbum.Size = new Size(43, 15);
+            lAlbum.Size = new Size(311, 15);
             lAlbum.TabIndex = 6;
             lAlbum.Text = "Album";
             // 
             // lNumbers
             // 
-            lNumbers.AutoSize = true;
             lNumbers.Location = new Point(132, 79);
             lNumbers.Name = "lNumbers";
-            lNumbers.Size = new Size(46, 15);
+            lNumbers.Size = new Size(311, 15);
             lNumbers.TabIndex = 7;
             lNumbers.Text = "#/#D/Y";
             // 
@@ -361,7 +439,7 @@ namespace Endless_WinForm
             tbPosition.Name = "tbPosition";
             tbPosition.Size = new Size(311, 45);
             tbPosition.TabIndex = 8;
-            tbPosition.TickFrequency = 5;
+            tbPosition.TickFrequency = 60;
             tbPosition.TickStyle = TickStyle.Both;
             tbPosition.Scroll += tbPosition_Seek;
             // 
@@ -451,7 +529,7 @@ namespace Endless_WinForm
             // 
             cmsQueue.Items.AddRange(new ToolStripItem[] { tsmiQueuePlay, tsmiQueuePlayNext, tssQueue, tsmiMoveUp, tsmiMoveDown, tsmiRemoveFromQueue, tsmiQueueCleanQueue });
             cmsQueue.Name = "cmsQueue";
-            cmsQueue.Size = new Size(185, 142);
+            cmsQueue.Size = new Size(185, 164);
             cmsQueue.Text = "Queue Item";
             toolTip.SetToolTip(cmsQueue, "Queue Item");
             // 
@@ -502,23 +580,6 @@ namespace Endless_WinForm
             tsmiQueueCleanQueue.Text = "Clean Queue";
             tsmiQueueCleanQueue.Click += tsmiCleanQueue_Click;
             // 
-            // nudVolume
-            // 
-            nudVolume.Location = new Point(449, 105);
-            nudVolume.Name = "nudVolume";
-            nudVolume.Size = new Size(50, 23);
-            nudVolume.TabIndex = 10;
-            nudVolume.Tag = "";
-            toolTip.SetToolTip(nudVolume, "Volume\r\nPress Middle Mouse Button to toggle Mute.");
-            nudVolume.Value = new decimal(new int[] { 100, 0, 0, 0 });
-            nudVolume.ValueChanged += nudVolume_ValueChanged;
-            nudVolume.MouseUp += nudVolume_MouseClick;
-            // 
-            // tDuration
-            // 
-            tDuration.Interval = 750;
-            tDuration.Tick += tDuration_Tick;
-            // 
             // tControls
             // 
             tControls.Enabled = true;
@@ -541,12 +602,25 @@ namespace Endless_WinForm
             tsmiRestoreSession.Text = "Restore Last Session?";
             tsmiRestoreSession.CheckedChanged += tsmiRestoreSession_CheckedChanged;
             // 
+            // tbVolume
+            // 
+            tbVolume.Location = new Point(454, 28);
+            tbVolume.Maximum = 100;
+            tbVolume.Name = "tbVolume";
+            tbVolume.Orientation = Orientation.Vertical;
+            tbVolume.Size = new Size(45, 114);
+            tbVolume.TabIndex = 11;
+            tbVolume.TickFrequency = 10;
+            tbVolume.TickStyle = TickStyle.Both;
+            tbVolume.Value = 100;
+            tbVolume.Scroll += tbVolume_ValueChanged;
+            // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(511, 563);
-            Controls.Add(nudVolume);
+            Controls.Add(tbVolume);
             Controls.Add(splitContainer1);
             Controls.Add(tbPosition);
             Controls.Add(lNumbers);
@@ -572,8 +646,8 @@ namespace Endless_WinForm
             splitContainer1.ResumeLayout(false);
             cmsPlaylist.ResumeLayout(false);
             cmsQueue.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)nudVolume).EndInit();
             cmsSettings.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)tbVolume).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -605,7 +679,6 @@ namespace Endless_WinForm
         private TrackBar tbPosition;
         private SplitContainer splitContainer1;
         private ListBox lbList;
-        private NumericUpDown nudVolume;
         private ListBox lbQueue;
         private ToolStripMenuItem tsmiAddFolder;
         private ToolStripMenuItem tsmiAddSong;
@@ -627,12 +700,21 @@ namespace Endless_WinForm
         private ToolStripMenuItem tsmiMoveUp;
         private ToolStripMenuItem tsmiMoveDown;
         private ToolStripMenuItem tsmiRemoveFromQueue;
-        private System.Windows.Forms.Timer tDuration;
         private System.Windows.Forms.Timer tControls;
         private ToolStripMenuItem tsmiSaveSession;
         private ToolStripMenuItem tsmiPlaylistCleanPlaylist;
         private ToolStripMenuItem tsmiQueueCleanQueue;
         private ContextMenuStrip cmsSettings;
         private ToolStripMenuItem tsmiRestoreSession;
+        private ToolStripSeparator tssBasic3;
+        private ToolStripDropDownButton tsddbQueueLooping;
+        private ToolStripMenuItem tsmiNoLoop;
+        private ToolStripMenuItem tsmiLoopOne;
+        private ToolStripMenuItem tsmiLoopPlaylist;
+        private ToolStripDropDownButton tsddbQueueRandom;
+        private ToolStripMenuItem tsmiNoRandom;
+        private ToolStripMenuItem tsmiUniqueRandom;
+        private ToolStripMenuItem tsmiNormalRandom;
+        private TrackBar tbVolume;
     }
 }

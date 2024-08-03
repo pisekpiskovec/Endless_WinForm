@@ -1,5 +1,7 @@
+using System.Buffers.Text;
 using System.ComponentModel;
 using System.Drawing.Imaging;
+using System.Windows.Forms.VisualStyles;
 using Endless_WinForm.Properties;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Mpv.NET.Player;
@@ -8,13 +10,15 @@ namespace Endless_WinForm
 {
     public partial class Main : Form
     {
-        BindingList<musItem> playlist = new BindingList<musItem>();
+        BindingList<musItem> playlist = new();
         BindingList<musItem> queue = new BindingList<musItem>();
         Panel panelMPV = new Panel();
         MpvPlayer player;
         bool isMediaLoaded = false, isMediaPlaying = false;
         string mediaPath = String.Empty;
-        int saveLocalVolume = 0, queueIndex = 0;
+        int saveLocalVolume = 0, playlistIndex = 0, playlistUnique = 0, queueIndex = 0, queueLoop = 2, queueRand = 1;
+        enum QueueLooping { NoLoop, LoopOne, LoopPlaylist };
+        enum QueueRandom { NoRandom, NormalRandom, UniqueRandom };
 
         public Main()
         {
@@ -24,13 +28,18 @@ namespace Endless_WinForm
             lbQueue.DataSource = queue;
             lbQueue.DisplayMember = "Display";
             player = new MpvPlayer(panelMPV.Handle);
+            player.MediaFinished += mediaFinished;
             player.Volume = Settings.Default.sessionLoadLast ? Settings.Default.volumeLast : 100;
-            nudVolume.Value = player.Volume;
+            tbVolume.Value = player.Volume;
             tsmiRestoreSession.Checked = Settings.Default.sessionLoadLast;
-            if (Settings.Default.sessionLoadLast) tsmiOpenLastSession.PerformClick();
+            if (Settings.Default.sessionLoadLast) {
+                tsmiOpenLastSession.PerformClick();
+                queueLoop = Settings.Default.queueLoop; queueRand = Settings.Default.queueRand;
+                PlayinModesSwitch(queueLoop, queueRand);
+            }
         }
 
-        private void fileLoad(string FileName, BindingList<musItem> list)
+        private static void fileLoad(string FileName, BindingList<musItem> list)
         {
             if (Path.GetExtension(FileName) == ".m3u")
             {
@@ -69,26 +78,20 @@ namespace Endless_WinForm
 
                 { for (int i = 0; i < openFileDialog.FileNames.Count(); i++) { fileLoad(openFileDialog.FileNames[i], playlist); } }
             }
-            catch { MessageBox.Show("Opening dialog failed. Please try again.", "Opening dialog failed", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+            catch { Console.WriteLine("Opening dialog failed."); }
         }
 
-        private void lbList_DoubleClick(object sender, EventArgs e) { if (playlist.Count > 0) loadMedia(playlist[lbList.SelectedIndex]); }
-        private void tsmiQueuePlay_Click(object sender, EventArgs e) { if (queue.Count > 0) loadMedia(queue[lbQueue.SelectedIndex], false); }
+        private void lbList_DoubleClick(object sender, EventArgs e) { if (playlist.Count > 0) { playlistIndex = lbList.SelectedIndex; loadMedia(playlist[lbList.SelectedIndex]); playlistIndex = lbList.SelectedIndex; } }
+        private void tsmiQueuePlay_Click(object sender, EventArgs e) { if (queue.Count > 0) { queueIndex = lbQueue.SelectedIndex; queueIndex = lbQueue.SelectedIndex; playlistIndex = playlist.FindIndexByKey(queue[queueIndex].Key); loadMedia(queue[lbQueue.SelectedIndex], false); } }
         public void loadMedia(musItem item, bool addToQueue = true)
         {
             player.Load(item.Path);
             mediaPath = item.Path;
-            if (addToQueue)
-            {
-                queue.Add(item);
-                queueIndex = queue.Count - 1;
-                lbQueue.SelectedIndex = queueIndex;
-            }
             isMediaLoaded = true;
-            player.Resume();
-            isMediaPlaying = true;
-            tDuration.Start();
 
+            if (addToQueue) { queue.Add(item); queueIndex = queue.Count - 1; }
+
+            try{lbQueue.SelectedIndex = queueIndex;} catch { Console.WriteLine("Couldnt select item in list."); }
             pbAlbum.BackgroundImage = item.Image;
             lTitle.Text = item.Title;
             lArtist.Text = item.Artist;
@@ -96,7 +99,14 @@ namespace Endless_WinForm
             lNumbers.Text = string.Empty;
             lNumbers.Text = (item.Track.ToString() ?? "0") + "/";
             lNumbers.Text += (item.Disc.ToString() ?? "0") + "/";
-            lNumbers.Text += (item.Year.ToString() ?? "0000");
+            lNumbers.Text += (item.Year.ToString() ?? "0000") + "//";
+            Text = isMediaLoaded ? "Endless | " + queue[queueIndex].Display : "Endless";
+            lNumbers.Text += playlistIndex + "/" + queueIndex + "/" + item.Key;
+
+            player.Resume();
+            isMediaPlaying = true;
+
+            ToastNotificationManagerCompat.History.Clear();
             new ToastContentBuilder()
                 .AddText("Now playing:")
                 .AddText($"{string.Join(", ", item.Artists)}\n{item.Title}\n{item.Album}")
@@ -106,30 +116,37 @@ namespace Endless_WinForm
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
-            tControls.Stop(); tDuration.Stop(); player.Dispose();
-            if (Settings.Default.sessionLoadLast) tsmiSaveSession.PerformClick();
+            tControls.Stop(); player.Dispose();
+            if (Settings.Default.sessionLoadLast)
+            {
+                tsmiSaveSession.PerformClick();
+                Settings.Default.queueLoop = queueLoop;
+                Settings.Default.queueRand = queueRand;
+            }
+
             Settings.Default.Save();
             ToastNotificationManagerCompat.Uninstall();
         }
 
-        private void nudVolume_ValueChanged(object sender, EventArgs e) { player.Volume = (int)nudVolume.Value; }
+        private void tbVolume_ValueChanged(object sender, EventArgs e) { player.Volume = tbVolume.Value; }
         private void nudVolume_MouseClick(object sender, MouseEventArgs e) { if (e.Button == MouseButtons.Middle) { if (player.Volume == 0) { player.Volume = saveLocalVolume; } else { saveLocalVolume = player.Volume; player.Volume = 0; } } }
         private void tDuration_Tick(object sender, EventArgs e)
         {
-            tbPosition.Maximum = (int)player.Duration.TotalSeconds;
+            tbPosition.Maximum = (int)player.Duration.TotalSeconds | 10;
             string hoursPosition = string.Empty;
             string hoursTotal = string.Empty;
             if (player.Duration.Hours.ToString("00") != "00") { hoursPosition = player.Position.Hours.ToString("00") + ":"; };
             if (player.Duration.Hours.ToString("00") != "00") { hoursTotal = player.Duration.Hours.ToString("00") + ":"; };
             tslDuration.Text = $"{hoursPosition}{player.Position.Minutes:00}:{player.Position.Seconds:00}/{hoursTotal}{player.Duration.Minutes:00}:{player.Duration.Seconds:00}";
+            tbPosition.Value = (int)player.Position.TotalSeconds;
         }
 
         private void tbPosition_Seek(object sender, EventArgs e) { player.Position = TimeSpan.FromSeconds(tbPosition.Value); }
         private void tControls_Tick(object sender, EventArgs e)
         {
             tbPosition.Enabled = isMediaLoaded;
-            tbPosition.Value = (int)player.Position.TotalSeconds;
-            nudVolume.Value = player.Volume;
+            tDuration_Tick(sender, e);
+            tbVolume.Value = player.Volume;
             tsbPrevious.Enabled = isMediaLoaded;
             tsbSeekBack.Enabled = player.Position.TotalSeconds >= 10;
             tsbPlay.Enabled = !isMediaPlaying && isMediaLoaded;
@@ -137,7 +154,6 @@ namespace Endless_WinForm
             tsbStop.Enabled = isMediaLoaded;
             tsbSeekForward.Enabled = player.Duration.TotalSeconds - player.Position.TotalSeconds >= 10;
             tsbNext.Enabled = isMediaLoaded;
-            this.Text = isMediaLoaded ? "Endless | " + queue[queueIndex].Display : "Endless";
             tsmiPlaylistCleanPlaylist.Enabled = playlist.Count > 0;
             tsmiPlaylistPlay.Enabled = playlist.Count > 0;
             tsmiPlaylistPlayNext.Enabled = playlist.Count > 0;
@@ -162,7 +178,6 @@ namespace Endless_WinForm
                 isMediaLoaded = true;
                 player.Resume();
                 isMediaPlaying = true;
-                tDuration.Start();
             }
         }
 
@@ -181,7 +196,6 @@ namespace Endless_WinForm
                 isMediaLoaded = true;
                 player.Resume();
                 isMediaPlaying = true;
-                tDuration.Start();
             }
         }
 
@@ -195,11 +209,11 @@ namespace Endless_WinForm
             }
         }
 
-        private void tsmiCleanQueue_Click(object sender, EventArgs e) { queue.Clear(); }
+        private void tsmiCleanQueue_Click(object sender, EventArgs e) { tsbStop_Click(sender, e); queue.Clear(); }
         private void tsmiCleanPlaylist_Click(object sender, EventArgs e) { playlist.Clear(); }
         private void tsmiSavePlaylist_Click(object sender, EventArgs e) { listSave(playlist); }
         private void tsmiSaveQueue_Click(object sender, EventArgs e) { listSave(queue); }
-        private void listSave(BindingList<musItem> list)
+        private static void listSave(BindingList<musItem> list)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "M3U|*.m3u";
@@ -210,17 +224,18 @@ namespace Endless_WinForm
                     System.IO.File.WriteAllLines(saveFileDialog.FileName, list.MusicListToArray());
                 }
             }
-            catch { MessageBox.Show("Opening dialog failed. Please try again.", "Opening dialog failed", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+            catch { Console.WriteLine("Opening dialog failed."); }
         }
 
         private void tsmiSaveSession_Click(object sender, EventArgs e)
         {
-            string[] sessionDirParts = { Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PÃ­sek_PÃ­skovec", "Endless_Data" };
+            string[] sessionDirParts = { Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Písek_Pískovec", "Endless_Data" };
             string sessionDir = Path.Combine(sessionDirParts);
 
             string[] playlistFileParts = { sessionDir, "playlist.m3u" };
             string[] queueFileParts = { sessionDir, "queue.m3u" };
-            string playlistFile = Path.Combine(playlistFileParts), queueFile = Path.Combine(queueFileParts);
+            string[] indexFileParts = { sessionDir, "index.txt" };
+            string playlistFile = Path.Combine(playlistFileParts), queueFile = Path.Combine(queueFileParts), indexFile = Path.Combine(indexFileParts);
 
             if (!Directory.Exists(sessionDir)) Directory.CreateDirectory(sessionDir);
 
@@ -235,13 +250,19 @@ namespace Endless_WinForm
             for (int i = 0; i < queue.Count; i++) { writer.WriteLine(queue[i].Path); }
             writer.Close();
             File.SetAttributes(queueFile, FileAttributes.Normal);
+
+            //Replace with settings
+            writer = new StreamWriter(indexFile, false, System.Text.Encoding.UTF8);
+            writer.WriteLine($"playlist={playlistIndex}\nqueue={queueIndex}");
+            writer.Close();
+            File.SetAttributes(indexFile, FileAttributes.Normal);
         }
 
         private void tsmiOpenPlaylist_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "M3U|*.m3u";
-            if(openFileDialog.ShowDialog() == DialogResult.OK)
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 StreamReader reader = new StreamReader(openFileDialog.FileName, System.Text.Encoding.Default);
                 string[] inputing = reader.ReadToEnd().Split('\n');
@@ -254,7 +275,7 @@ namespace Endless_WinForm
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "M3U|*.m3u";
-            if(openFileDialog.ShowDialog() == DialogResult.OK)
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 StreamReader reader = new StreamReader(openFileDialog.FileName, System.Text.Encoding.Default);
                 string[] inputing = reader.ReadToEnd().Split('\n');
@@ -265,7 +286,7 @@ namespace Endless_WinForm
 
         private void tsmiOpenLastSession_Click(object sender, EventArgs e)
         {
-            string[] sessionDirParts = { Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PÃ­sek_PÃ­skovec", "Endless_Data" };
+            string[] sessionDirParts = { Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Písek_Pískovec", "Endless_Data" };
             string sessionDir = Path.Combine(sessionDirParts);
 
             if (!Directory.Exists(sessionDir))
@@ -277,9 +298,10 @@ namespace Endless_WinForm
 
             string[] playlistFileParts = { sessionDir, "playlist.m3u" };
             string[] queueFileParts = { sessionDir, "queue.m3u" };
-            string playlistFile = Path.Combine(playlistFileParts), queueFile = Path.Combine(queueFileParts);
+            string[] indexFileParts = { sessionDir, "index.txt" };
+            string playlistFile = Path.Combine(playlistFileParts), queueFile = Path.Combine(queueFileParts), indexFile = Path.Combine(indexFileParts);
 
-            if (!File.Exists(playlistFile) || !File.Exists(queueFile))
+            if (!File.Exists(playlistFile) || !File.Exists(queueFile) || !File.Exists(indexFile))
             {
                 MessageBox.Show("Saved session's files eiter don't exsists or are corrupted.", "Can't load last session!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -307,6 +329,18 @@ namespace Endless_WinForm
                 fileLoad(str, queue);
             }
             reader.Close();
+
+            //Replace with settings
+            reader = new StreamReader(indexFile, System.Text.Encoding.UTF8);
+            inputing = reader.ReadToEnd().Split("\n");
+            for (int i = 0;i < inputing.Length - 1; i++)
+            {
+                if (inputing[i].StartsWith("playlist=")) { inputing[i] = inputing[i].Substring(9); playlistIndex = int.Parse(inputing[i]); }
+                else
+                if (inputing[i].StartsWith("queue=")) { inputing[i] = inputing[i].Substring(6); queueIndex = int.Parse(inputing[i]); }
+                else { Console.WriteLine($"Invalid parameter at line {i + 1} of file {indexFile}"); }
+            }
+            reader.Close();
         }
 
         private void playNext(BindingList<musItem> list, ListBox listBox)
@@ -319,8 +353,8 @@ namespace Endless_WinForm
 
         private void tsmiPlaylistPlayNext_Click(object sender, EventArgs e) { playNext(playlist, lbList); }
         private void tsmiQueuePlayNext_Click(object sender, EventArgs e) { playNext(queue, lbQueue); }
-        private void tsmiRemoveFromPlaylist_Click(object sender, EventArgs e) { playlist.RemoveAt(lbList.SelectedIndex); }
-        private void tsmiRemoveFromQueue_Click(object sender, EventArgs e) { queue.RemoveAt(lbQueue.SelectedIndex); }
+        private void tsmiRemoveFromPlaylist_Click(object sender, EventArgs e) { if (lbList.SelectedIndex < playlistIndex) playlistIndex--; playlist.RemoveAt(lbList.SelectedIndex); }
+        private void tsmiRemoveFromQueue_Click(object sender, EventArgs e) { if (lbQueue.SelectedIndex < queueIndex) queueIndex--; queue.RemoveAt(lbQueue.SelectedIndex); }
         private void tsmiMoveUp_Click(object sender, EventArgs e) { queue.Move(lbQueue.SelectedIndex, lbQueue.SelectedIndex - 1); }
         private void tsmiMoveDown_Click(object sender, EventArgs e) { queue.Move(lbQueue.SelectedIndex, lbQueue.SelectedIndex + 1); }
 
@@ -335,6 +369,154 @@ namespace Endless_WinForm
         }
 
         private void tsmiRestoreSession_CheckedChanged(object sender, EventArgs e) { Settings.Default.sessionLoadLast = tsmiRestoreSession.Checked; }
+        private void PlayinModesSwitch(int qLoop, int qRand)
+        {
+            switch (qLoop)
+            {
+                case (int)QueueLooping.NoLoop:
+                    tsmiNoLoop.Checked = true;
+                    tsmiLoopOne.Checked = false;
+                    tsmiLoopPlaylist.Checked = false;
+                    break;
+                case (int)QueueLooping.LoopOne:
+                    tsmiNoLoop.Checked = false;
+                    tsmiLoopOne.Checked = true;
+                    tsmiLoopPlaylist.Checked = false;
+                    break;
+                case (int)QueueLooping.LoopPlaylist:
+                    tsmiNoLoop.Checked = false;
+                    tsmiLoopOne.Checked = false;
+                    tsmiLoopPlaylist.Checked = true;
+                    break;
+            }
+            switch (qRand)
+            {
+                case (int)QueueRandom.NoRandom:
+                    tsmiNoRandom.Checked = true;
+                    tsmiUniqueRandom.Checked = false;
+                    tsmiNormalRandom.Checked = false;
+                    break;
+                case (int)QueueRandom.NormalRandom:
+                    tsmiNoRandom.Checked = false;
+                    tsmiNormalRandom.Checked = true;
+                    tsmiUniqueRandom.Checked = false;
+                    break;
+                case (int)QueueRandom.UniqueRandom:
+                    tsmiNoRandom.Checked = true;
+                    tsmiNormalRandom.Checked = false;
+                    tsmiUniqueRandom.Checked = true;
+                    break;
+            }
+        }
+
+        private void tsmiNoLoop_Click(object sender, EventArgs e) { queueLoop = (int)QueueLooping.NoLoop; PlayinModesSwitch(queueLoop, queueRand); }
+        private void tsmiLoopOne_Click(object sender, EventArgs e) { queueLoop = (int)QueueLooping.LoopOne; PlayinModesSwitch(queueLoop, queueRand); }
+        private void tsmiLoopPlaylist_Click(object sender, EventArgs e) { queueLoop = (int)QueueLooping.LoopPlaylist; PlayinModesSwitch(queueLoop, queueRand); }
+        private void tsmiNoRandom_Click(object sender, EventArgs e) { queueRand = (int)QueueRandom.NoRandom; PlayinModesSwitch(queueLoop, queueRand); }
+        private void tsmiNormmalRandom_Click(object sender, EventArgs e) { queueRand = (int)QueueRandom.NormalRandom; PlayinModesSwitch(queueLoop, queueRand); }
+        private void tsmiUniqueRandom_Click(object sender, EventArgs e) { queueRand = (int)QueueRandom.UniqueRandom; PlayinModesSwitch(queueLoop, queueRand); }
+        private void mediaFinished(object? sender, EventArgs e)
+        {
+            tsbStop_Click(sender ?? this, e); playlist[playlistIndex].Played = true; queue[queueIndex].Played = true; playlistUnique++;
+            switch (queueLoop)
+            {
+                case (int)QueueLooping.NoLoop:
+                    if (queue.Count < Settings.Default.queueCapacity)
+                    {
+                        if (queueIndex == queue.Count - 1)
+                        {
+                            if (playlistIndex == playlist.Count - 1)
+                            {
+                                tsbStop_Click(sender ?? this, e);
+                                foreach (musItem item in playlist) item.Played = false;
+                                foreach (musItem item in queue) item.Played = false;
+                                return;
+                            }
+                            else
+                            {
+                                switch (queueRand)
+                                { 
+                                    case (int)QueueRandom.NoRandom: playlistIndex++; break;
+                                    case (int)QueueRandom.NormalRandom: playlistIndex = RandomNumber(); break;
+                                    case (int)QueueRandom.UniqueRandom: playlistIndex = RandomNumber(true); break;
+                                }
+                                queue.Add(playlist[playlistIndex]);
+                            }
+                        }
+                        queueIndex++;
+                        loadMedia(queue[queueIndex], false);
+                    }
+                    else
+                    {
+                        for(int i = 0; i <= queue.Count - Settings.Default.queueCapacity; i++) queue.RemoveAt(0);
+                        queue.Add(playlist[playlistIndex]);
+                        loadMedia(queue[queueIndex], false);
+                        switch (queueRand)
+                        {
+                            case (int)QueueRandom.NoRandom: playlistIndex += (playlistIndex == playlist.Count - 1) ? 0 : 1; break;
+                            case (int)QueueRandom.NormalRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(); break;
+                            case (int)QueueRandom.UniqueRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(true); break;
+                        }
+                    }
+                    break;
+                case (int)QueueLooping.LoopOne:
+                    loadMedia(queue[queueIndex], false);
+                    break;
+                case (int)QueueLooping.LoopPlaylist:
+                    if (queue.Count < Settings.Default.queueCapacity)
+                    {
+                        if (queueIndex == queue.Count - 1)
+                        {
+                            if (playlistIndex == playlist.Count - 1)
+                            {
+                                playlistIndex = 0;
+                                foreach (musItem item in playlist) item.Played = false;
+                                foreach (musItem item in queue) item.Played = false;
+                            }
+                            else
+                            {
+                                switch (queueRand)
+                                {
+                                    case (int)QueueRandom.NoRandom: playlistIndex++; break;
+                                    case (int)QueueRandom.NormalRandom: playlistIndex = RandomNumber(); break;
+                                    case (int)QueueRandom.UniqueRandom: playlistIndex = RandomNumber(true); break;
+                                }
+                                queue.Add(playlist[playlistIndex]);
+                            }
+                        }
+                        queueIndex++;
+                        loadMedia(queue[queueIndex], false);
+                    }
+                    else
+                    {
+                        for (int i = 0; i <= queue.Count - Settings.Default.queueCapacity; i++) queue.RemoveAt(0);
+                        queue.Add(playlist[playlistIndex]);
+                        loadMedia(queue[queueIndex], false);
+                        switch (queueRand)
+                        {
+                            case (int)QueueRandom.NoRandom:
+                                if (playlistIndex == playlist.Count - 1)
+                                {
+                                    playlistIndex = 0;
+                                    foreach (musItem item in playlist) item.Played = false;
+                                    foreach (musItem item in queue) item.Played = false;
+                                }
+                                else playlistIndex++;
+                                break;
+                            case (int)QueueRandom.NormalRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(); break;
+                            case (int)QueueRandom.UniqueRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(true); break;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        private int RandomNumber(bool Unique = false)
+        {
+            int GeneratedNum = new Random().Next(0, playlist.Count);
+            if(Unique && playlist[GeneratedNum].Played) GeneratedNum = RandomNumber(Unique);
+            return GeneratedNum;
+        }
     }
 
     public static class Listing
@@ -358,6 +540,8 @@ namespace Endless_WinForm
             }
             return result;
         }
+
+        public static int FindIndexByKey(this BindingList<musItem> list, string QuerryKey) { for (int i = 0; i < list.Count; i++) if (list[i].Key == QuerryKey) return i; return 0; }
     }
 
     public static class Imaging
@@ -382,7 +566,9 @@ namespace Endless_WinForm
         public uint Disc { get; set; } = 0;
         public uint Year { get; set; } = 0;
         public Image Image { get; set; } = Resources.generic_music_file_100px;
+        public bool Played { get; set; } = false;
         private string Unknown = "Unknown";
-        public string Display { get { return $"{Artists[0] ?? Unknown} - {Title ?? Unknown} - {Album ?? Unknown}"; } }
+        public string Display { get { return $"{Artists[0] ?? Unknown} - {Title ?? Unknown} - {Album ?? Unknown} - {Track}/{Disc}"; } }
+        public string Key { get { return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(Path)); } }
     }
 }
