@@ -83,7 +83,7 @@ namespace Endless_WinForm
         }
 
         private void lbList_DoubleClick(object sender, EventArgs e) { if (playlist.Count > 0) { playlistIndex = lbList.SelectedIndex; loadMedia(playlist[lbList.SelectedIndex]); playlistIndex = lbList.SelectedIndex; } }
-        private void tsmiQueuePlay_Click(object sender, EventArgs e) { if (queue.Count > 0) { queueIndex = lbQueue.SelectedIndex; queueIndex = lbQueue.SelectedIndex; playlistIndex = playlist.FindIndexByKey(queue[queueIndex].Key); loadMedia(queue[lbQueue.SelectedIndex], false); } }
+        private void tsmiQueuePlay_Click(object sender, EventArgs e) { if (queue.Count > 0) { queueIndex = lbQueue.SelectedIndex; queueIndex = lbQueue.SelectedIndex; playlistIndex = playlist.FindIndexByKey(queue[queueIndex].Key); tsbStop_Click(sender ?? this, e); loadMedia(queue[lbQueue.SelectedIndex], false); } }
         public void loadMedia(musItem item, bool addToQueue = true, bool PlayFlag = true)
         {
             player.Load(item.Path);
@@ -101,9 +101,10 @@ namespace Endless_WinForm
             lNumbers.Text = string.Empty;
             lNumbers.Text = (item.Track.ToString() ?? "0") + "/";
             lNumbers.Text += (item.Disc.ToString() ?? "0") + "/";
-            lNumbers.Text += (item.Year.ToString() ?? "0000") + "//";
+            lNumbers.Text += (item.Year.ToString() ?? "0000");
             Text = isMediaLoaded ? "Endless | " + queue[queueIndex].Display : "Endless";
-            lNumbers.Text += playlistIndex + "/" + queueIndex + "/" + item.Key;
+            //Debug
+            lNumbers.Text += "//" + playlistIndex + "/" + queueIndex + "/" + tbPosition.Maximum;
 
             if (PlayFlag) {
                 player.Resume();
@@ -133,10 +134,10 @@ namespace Endless_WinForm
         }
 
         private void tbVolume_ValueChanged(object sender, EventArgs e) { player.Volume = tbVolume.Value; }
-        private void nudVolume_MouseClick(object sender, MouseEventArgs e) { if (e.Button == MouseButtons.Middle) { if (player.Volume == 0) { player.Volume = saveLocalVolume; } else { saveLocalVolume = player.Volume; player.Volume = 0; } } }
+        private void nudVolume_MouseClick(object sender, MouseEventArgs e) { if (e.Button == MouseButtons.Right) { if (player.Volume == 0) { player.Volume = saveLocalVolume; } else { saveLocalVolume = player.Volume; player.Volume = 0; } } }
         private void tDuration_Tick(object sender, EventArgs e)
         {
-            tbPosition.Maximum = (int)player.Duration.TotalSeconds | 10;
+            tbPosition.Maximum = isMediaLoaded ? (int)player.Duration.TotalSeconds : 10;
             string hoursPosition = string.Empty;
             string hoursTotal = string.Empty;
             if (player.Duration.Hours.ToString("00") != "00") { hoursPosition = player.Position.Hours.ToString("00") + ":"; };
@@ -335,21 +336,13 @@ namespace Endless_WinForm
             queueIndex = Settings.Default.queueIndex;
         }
 
-        private void playNext(BindingList<musItem> list, ListBox listBox)
-        {
-            if (list.Count > 0)
-            {
-                queue.Insert(queueIndex + 1, list[listBox.SelectedIndex]);
-            }
-        }
-
+        private void playNext(BindingList<musItem> list, ListBox listBox) { if (list.Count > 0) { queue.Insert(queueIndex + 1, list[listBox.SelectedIndex]); } }
         private void tsmiPlaylistPlayNext_Click(object sender, EventArgs e) { playNext(playlist, lbList); }
         private void tsmiQueuePlayNext_Click(object sender, EventArgs e) { playNext(queue, lbQueue); }
         private void tsmiRemoveFromPlaylist_Click(object sender, EventArgs e) { if (lbList.SelectedIndex < playlistIndex) playlistIndex--; playlist.RemoveAt(lbList.SelectedIndex); }
         private void tsmiRemoveFromQueue_Click(object sender, EventArgs e) { if (lbQueue.SelectedIndex < queueIndex) queueIndex--; queue.RemoveAt(lbQueue.SelectedIndex); }
         private void tsmiMoveUp_Click(object sender, EventArgs e) { queue.Move(lbQueue.SelectedIndex, lbQueue.SelectedIndex - 1); }
         private void tsmiMoveDown_Click(object sender, EventArgs e) { queue.Move(lbQueue.SelectedIndex, lbQueue.SelectedIndex + 1); }
-
         private void tslDuration_MouseUp(object sender, MouseEventArgs e)
         {
             switch (e.Button)

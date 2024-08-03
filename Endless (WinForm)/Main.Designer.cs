@@ -614,6 +614,7 @@ namespace Endless_WinForm
             tbVolume.TickStyle = TickStyle.Both;
             tbVolume.Value = 100;
             tbVolume.Scroll += tbVolume_ValueChanged;
+            tbVolume.MouseUp += nudVolume_MouseClick;
             // 
             // Main
             // 
