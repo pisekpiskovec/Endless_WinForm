@@ -36,6 +36,7 @@ namespace Endless_WinForm
                 tsmiOpenLastSession.PerformClick();
                 queueLoop = Settings.Default.queueLoop; queueRand = Settings.Default.queueRand;
                 PlayinModesSwitch(queueLoop, queueRand);
+                loadMedia(queue[queueIndex], false, false);
             }
         }
 
@@ -83,7 +84,7 @@ namespace Endless_WinForm
 
         private void lbList_DoubleClick(object sender, EventArgs e) { if (playlist.Count > 0) { playlistIndex = lbList.SelectedIndex; loadMedia(playlist[lbList.SelectedIndex]); playlistIndex = lbList.SelectedIndex; } }
         private void tsmiQueuePlay_Click(object sender, EventArgs e) { if (queue.Count > 0) { queueIndex = lbQueue.SelectedIndex; queueIndex = lbQueue.SelectedIndex; playlistIndex = playlist.FindIndexByKey(queue[queueIndex].Key); loadMedia(queue[lbQueue.SelectedIndex], false); } }
-        public void loadMedia(musItem item, bool addToQueue = true)
+        public void loadMedia(musItem item, bool addToQueue = true, bool PlayFlag = true)
         {
             player.Load(item.Path);
             mediaPath = item.Path;
@@ -91,7 +92,8 @@ namespace Endless_WinForm
 
             if (addToQueue) { queue.Add(item); queueIndex = queue.Count - 1; }
 
-            try{lbQueue.SelectedIndex = queueIndex;} catch { Console.WriteLine("Couldnt select item in list."); }
+            try { lbQueue.SelectedIndex = queueIndex; } catch { Console.WriteLine("Couldnt select item in list."); }
+            try { lbList.SelectedIndex = playlistIndex; } catch { Console.WriteLine("Couldnt select item in list."); }
             pbAlbum.BackgroundImage = item.Image;
             lTitle.Text = item.Title;
             lArtist.Text = item.Artist;
@@ -103,15 +105,17 @@ namespace Endless_WinForm
             Text = isMediaLoaded ? "Endless | " + queue[queueIndex].Display : "Endless";
             lNumbers.Text += playlistIndex + "/" + queueIndex + "/" + item.Key;
 
-            player.Resume();
-            isMediaPlaying = true;
+            if (PlayFlag) {
+                player.Resume();
+                isMediaPlaying = true; 
 
-            ToastNotificationManagerCompat.History.Clear();
-            new ToastContentBuilder()
-                .AddText("Now playing:")
-                .AddText($"{string.Join(", ", item.Artists)}\n{item.Title}\n{item.Album}")
-                .AddHeroImage(Imaging.ImageToUri(item.Image))
-                .Show();
+                ToastNotificationManagerCompat.History.Clear();
+                new ToastContentBuilder()
+                    .AddText("Now playing:")
+                    .AddText($"{string.Join(", ", item.Artists)}\n{item.Title}\n{item.Album}")
+                    .AddHeroImage(Imaging.ImageToUri(item.Image))
+                    .Show();
+            }
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
@@ -251,11 +255,8 @@ namespace Endless_WinForm
             writer.Close();
             File.SetAttributes(queueFile, FileAttributes.Normal);
 
-            //Replace with settings
-            writer = new StreamWriter(indexFile, false, System.Text.Encoding.UTF8);
-            writer.WriteLine($"playlist={playlistIndex}\nqueue={queueIndex}");
-            writer.Close();
-            File.SetAttributes(indexFile, FileAttributes.Normal);
+            Settings.Default.playlistIndex = playlistIndex;
+            Settings.Default.queueIndex = queueIndex;
         }
 
         private void tsmiOpenPlaylist_Click(object sender, EventArgs e)
@@ -330,17 +331,8 @@ namespace Endless_WinForm
             }
             reader.Close();
 
-            //Replace with settings
-            reader = new StreamReader(indexFile, System.Text.Encoding.UTF8);
-            inputing = reader.ReadToEnd().Split("\n");
-            for (int i = 0;i < inputing.Length - 1; i++)
-            {
-                if (inputing[i].StartsWith("playlist=")) { inputing[i] = inputing[i].Substring(9); playlistIndex = int.Parse(inputing[i]); }
-                else
-                if (inputing[i].StartsWith("queue=")) { inputing[i] = inputing[i].Substring(6); queueIndex = int.Parse(inputing[i]); }
-                else { Console.WriteLine($"Invalid parameter at line {i + 1} of file {indexFile}"); }
-            }
-            reader.Close();
+            playlistIndex = Settings.Default.playlistIndex;
+            queueIndex = Settings.Default.queueIndex;
         }
 
         private void playNext(BindingList<musItem> list, ListBox listBox)
