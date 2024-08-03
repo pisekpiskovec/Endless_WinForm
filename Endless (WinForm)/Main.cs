@@ -121,15 +121,15 @@ namespace Endless_WinForm
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
-            tControls.Stop(); player.Dispose();
             if (Settings.Default.sessionLoadLast)
             {
                 tsmiSaveSession.PerformClick();
                 Settings.Default.queueLoop = queueLoop;
                 Settings.Default.queueRand = queueRand;
             }
-
             Settings.Default.Save();
+
+            tControls.Stop(); player.Dispose();
             ToastNotificationManagerCompat.Uninstall();
         }
 
@@ -258,6 +258,7 @@ namespace Endless_WinForm
 
             Settings.Default.playlistIndex = playlistIndex;
             Settings.Default.queueIndex = queueIndex;
+            Settings.Default.volumeLast = player.Volume;
         }
 
         private void tsmiOpenPlaylist_Click(object sender, EventArgs e)
@@ -334,6 +335,7 @@ namespace Endless_WinForm
 
             playlistIndex = Settings.Default.playlistIndex;
             queueIndex = Settings.Default.queueIndex;
+            tbVolume.Value = Settings.Default.volumeLast;
         }
 
         private void playNext(BindingList<musItem> list, ListBox listBox) { if (list.Count > 0) { queue.Insert(queueIndex + 1, list[listBox.SelectedIndex]); } }
