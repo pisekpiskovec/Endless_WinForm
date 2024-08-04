@@ -239,8 +239,7 @@ namespace Endless_WinForm
 
             string[] playlistFileParts = { sessionDir, "playlist.m3u" };
             string[] queueFileParts = { sessionDir, "queue.m3u" };
-            string[] indexFileParts = { sessionDir, "index.txt" };
-            string playlistFile = Path.Combine(playlistFileParts), queueFile = Path.Combine(queueFileParts), indexFile = Path.Combine(indexFileParts);
+            string playlistFile = Path.Combine(playlistFileParts), queueFile = Path.Combine(queueFileParts);
 
             if (!Directory.Exists(sessionDir)) Directory.CreateDirectory(sessionDir);
 
@@ -301,15 +300,15 @@ namespace Endless_WinForm
 
             string[] playlistFileParts = { sessionDir, "playlist.m3u" };
             string[] queueFileParts = { sessionDir, "queue.m3u" };
-            string[] indexFileParts = { sessionDir, "index.txt" };
-            string playlistFile = Path.Combine(playlistFileParts), queueFile = Path.Combine(queueFileParts), indexFile = Path.Combine(indexFileParts);
+            string playlistFile = Path.Combine(playlistFileParts), queueFile = Path.Combine(queueFileParts);
 
-            if (!File.Exists(playlistFile) || !File.Exists(queueFile) || !File.Exists(indexFile))
+            if (!File.Exists(playlistFile) || !File.Exists(queueFile))
             {
                 MessageBox.Show("Saved session's files eiter don't exsists or are corrupted.", "Can't load last session!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
+            playlist.Clear(); queue.Clear();
             StreamReader reader;
             string[] inputing;
 
