@@ -440,7 +440,7 @@ namespace Endless_WinForm
                         loadMedia(queue[queueIndex], false);
                         switch (queueRand)
                         {
-                            case (int)QueueRandom.NoRandom: playlistIndex += (playlistIndex == playlist.Count - 1) ? 0 : 1; break;
+                            case (int)QueueRandom.NoRandom: playlistIndex += Convert.ToInt32(playlistIndex == playlist.Count - 1); break;
                             case (int)QueueRandom.NormalRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(); break;
                             case (int)QueueRandom.UniqueRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(true); break;
                         }
