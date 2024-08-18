@@ -7,3 +7,4 @@
 * [ ] Looping
 * [ ] Random playback
 * [ ] About
+* [ ] Move to Databases
