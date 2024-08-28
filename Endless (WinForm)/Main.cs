@@ -83,7 +83,7 @@ namespace Endless_WinForm
         }
 
         private void lbList_DoubleClick(object sender, EventArgs e) { if (playlist.Count > 0) { playlistIndex = lbList.SelectedIndex; loadMedia(playlist[lbList.SelectedIndex]); playlistIndex = lbList.SelectedIndex; } }
-        private void tsmiQueuePlay_Click(object sender, EventArgs e) { if (queue.Count > 0) { queueIndex = lbQueue.SelectedIndex; queueIndex = lbQueue.SelectedIndex; playlistIndex = playlist.FindIndexByKey(queue[queueIndex].Key); tsbStop_Click(sender ?? this, e); loadMedia(queue[lbQueue.SelectedIndex], false); } }
+        private void tsmiQueuePlay_Click(object sender, EventArgs e) { if (queue.Count > 0) { queueIndex = lbQueue.SelectedIndex; queueIndex = lbQueue.SelectedIndex; playlistIndex = playlist.FindIndexByKey(queue[queueIndex].Path); tsbStop_Click(sender ?? this, e); loadMedia(queue[lbQueue.SelectedIndex], false); } }
         public void loadMedia(musItem item, bool addToQueue = true, bool PlayFlag = true)
         {
             player.Load(item.Path);
@@ -527,7 +527,7 @@ namespace Endless_WinForm
             return result;
         }
 
-        public static int FindIndexByKey(this BindingList<musItem> list, string QuerryKey) { for (int i = 0; i < list.Count; i++) if (list[i].Key == QuerryKey) return i; return 0; }
+        public static int FindIndexByKey(this BindingList<musItem> list, string QuerryKey) { for (int i = 0; i < list.Count; i++) if (list[i].Path == QuerryKey) return i; return 0; }
     }
 
     public static class Imaging
@@ -555,6 +555,5 @@ namespace Endless_WinForm
         public bool Played { get; set; } = false;
         private string Unknown = "Unknown";
         public string Display { get { return $"{Artists[0] ?? Unknown} - {Title ?? Unknown} - {Album ?? Unknown} - {Track}/{Disc}"; } }
-        public string Key { get { return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(Path)); } }
     }
 }
