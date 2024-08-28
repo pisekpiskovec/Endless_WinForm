@@ -433,7 +433,7 @@ namespace Endless_WinForm
                     }
                     else
                     {
-                        for(int i = 0; i <= queue.Count - Settings.Default.queueCapacity; i++) queue.RemoveAt(0);
+                        for(int i = 0; i <= queue.Count - Settings.Default.queueCapacity + 1; i++) queue.RemoveAt(0);
                         switch (queueRand)
                         {
                             case (int)QueueRandom.NoRandom: playlistIndex += Convert.ToInt32(playlistIndex != playlist.Count - 1); break;
