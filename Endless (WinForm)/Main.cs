@@ -422,8 +422,8 @@ namespace Endless_WinForm
                                 switch (queueRand)
                                 { 
                                     case (int)QueueRandom.NoRandom: playlistIndex++; break;
-                                    case (int)QueueRandom.NormalRandom: playlistIndex = RandomNumber(); break;
-                                    case (int)QueueRandom.UniqueRandom: playlistIndex = RandomNumber(true); break;
+                                    //case (int)QueueRandom.NormalRandom: playlistIndex = RandomNumber(); break;
+                                    //case (int)QueueRandom.UniqueRandom: playlistIndex = RandomNumber(true); break;
                                 }
                                 queue.Add(playlist[playlistIndex]);
                             }
@@ -437,8 +437,8 @@ namespace Endless_WinForm
                         switch (queueRand)
                         {
                             case (int)QueueRandom.NoRandom: playlistIndex += Convert.ToInt32(playlistIndex != playlist.Count - 1); break;
-                            case (int)QueueRandom.NormalRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(); break;
-                            case (int)QueueRandom.UniqueRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(true); break;
+                            //case (int)QueueRandom.NormalRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(); break;
+                            //case (int)QueueRandom.UniqueRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(true); break;
                         }
                         loadMedia(playlist[playlistIndex]);
                     }
@@ -462,8 +462,8 @@ namespace Endless_WinForm
                                 switch (queueRand)
                                 {
                                     case (int)QueueRandom.NoRandom: playlistIndex++; break;
-                                    case (int)QueueRandom.NormalRandom: playlistIndex = RandomNumber(); break;
-                                    case (int)QueueRandom.UniqueRandom: playlistIndex = RandomNumber(true); break;
+                                    //case (int)QueueRandom.NormalRandom: playlistIndex = RandomNumber(); break;
+                                    //case (int)QueueRandom.UniqueRandom: playlistIndex = RandomNumber(true); break;
                                 }
                                 queue.Add(playlist[playlistIndex]);
                             }
@@ -484,8 +484,8 @@ namespace Endless_WinForm
                                     foreach (musItem item in queue) item.Played = false;
                                 } else playlistIndex++;
                                 break;
-                            case (int)QueueRandom.NormalRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(); break;
-                            case (int)QueueRandom.UniqueRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(true); break;
+                            //case (int)QueueRandom.NormalRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(); break;
+                            //case (int)QueueRandom.UniqueRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(true); break;
                         }
                         loadMedia(playlist[playlistIndex]);
                     }
