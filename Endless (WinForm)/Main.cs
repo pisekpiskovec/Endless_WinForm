@@ -473,9 +473,7 @@ namespace Endless_WinForm
                     }
                     else
                     {
-                        for (int i = 0; i <= queue.Count - Settings.Default.queueCapacity; i++) queue.RemoveAt(0);
-                        queue.Add(playlist[playlistIndex]);
-                        loadMedia(queue[queueIndex], false);
+                        for (int i = 0; i <= queue.Count - Settings.Default.queueCapacity + 1; i++) queue.RemoveAt(0);
                         switch (queueRand)
                         {
                             case (int)QueueRandom.NoRandom:
@@ -484,12 +482,12 @@ namespace Endless_WinForm
                                     playlistIndex = 0;
                                     foreach (musItem item in playlist) item.Played = false;
                                     foreach (musItem item in queue) item.Played = false;
-                                }
-                                else playlistIndex++;
+                                } else playlistIndex++;
                                 break;
                             case (int)QueueRandom.NormalRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(); break;
                             case (int)QueueRandom.UniqueRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(true); break;
                         }
+                        loadMedia(playlist[playlistIndex]);
                     }
                     break;
             }
