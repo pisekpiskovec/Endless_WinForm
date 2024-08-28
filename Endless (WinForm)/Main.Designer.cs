@@ -357,6 +357,7 @@ namespace Endless_WinForm
             // 
             tsddbQueueRandom.DisplayStyle = ToolStripItemDisplayStyle.Image;
             tsddbQueueRandom.DropDownItems.AddRange(new ToolStripItem[] { tsmiNoRandom, tsmiNormalRandom, tsmiUniqueRandom });
+            tsddbQueueRandom.Enabled = false;
             tsddbQueueRandom.Image = Resources.shuffle_100px;
             tsddbQueueRandom.ImageTransparentColor = Color.Magenta;
             tsddbQueueRandom.Name = "tsddbQueueRandom";
@@ -367,7 +368,7 @@ namespace Endless_WinForm
             // 
             tsmiNoRandom.DisplayStyle = ToolStripItemDisplayStyle.Text;
             tsmiNoRandom.Name = "tsmiNoRandom";
-            tsmiNoRandom.Size = new Size(154, 22);
+            tsmiNoRandom.Size = new Size(180, 22);
             tsmiNoRandom.Text = "No Shuffle";
             tsmiNoRandom.Click += tsmiNoRandom_Click;
             // 
@@ -377,7 +378,7 @@ namespace Endless_WinForm
             tsmiNormalRandom.CheckState = CheckState.Checked;
             tsmiNormalRandom.DisplayStyle = ToolStripItemDisplayStyle.Text;
             tsmiNormalRandom.Name = "tsmiNormalRandom";
-            tsmiNormalRandom.Size = new Size(154, 22);
+            tsmiNormalRandom.Size = new Size(180, 22);
             tsmiNormalRandom.Text = "Normal Shuffle";
             tsmiNormalRandom.Click += tsmiNormmalRandom_Click;
             // 
@@ -385,7 +386,7 @@ namespace Endless_WinForm
             // 
             tsmiUniqueRandom.DisplayStyle = ToolStripItemDisplayStyle.Text;
             tsmiUniqueRandom.Name = "tsmiUniqueRandom";
-            tsmiUniqueRandom.Size = new Size(154, 22);
+            tsmiUniqueRandom.Size = new Size(180, 22);
             tsmiUniqueRandom.Text = "Unique Shuffle";
             tsmiUniqueRandom.Click += tsmiUniqueRandom_Click;
             // 
@@ -529,7 +530,7 @@ namespace Endless_WinForm
             // 
             cmsQueue.Items.AddRange(new ToolStripItem[] { tsmiQueuePlay, tsmiQueuePlayNext, tssQueue, tsmiMoveUp, tsmiMoveDown, tsmiRemoveFromQueue, tsmiQueueCleanQueue });
             cmsQueue.Name = "cmsQueue";
-            cmsQueue.Size = new Size(185, 164);
+            cmsQueue.Size = new Size(185, 142);
             cmsQueue.Text = "Queue Item";
             toolTip.SetToolTip(cmsQueue, "Queue Item");
             // 

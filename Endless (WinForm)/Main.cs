@@ -34,7 +34,7 @@ namespace Endless_WinForm
             tsmiRestoreSession.Checked = Settings.Default.sessionLoadLast;
             if (Settings.Default.sessionLoadLast) {
                 tsmiOpenLastSession.PerformClick();
-                queueLoop = Settings.Default.queueLoop; queueRand = Settings.Default.queueRand;
+                queueLoop = Settings.Default.queueLoop; //queueRand = Settings.Default.queueRand;
                 PlayinModesSwitch(queueLoop, queueRand);
                 loadMedia(queue[queueIndex], false, false);
             }
