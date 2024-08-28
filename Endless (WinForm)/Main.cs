@@ -16,7 +16,7 @@ namespace Endless_WinForm
         MpvPlayer player;
         bool isMediaLoaded = false, isMediaPlaying = false;
         string mediaPath = String.Empty;
-        int saveLocalVolume = 0, playlistIndex = 0, playlistUnique = 0, queueIndex = 0, queueLoop = 2, queueRand = 1;
+        int saveLocalVolume = 0, playlistIndex = 0, playlistUnique = 0, queueIndex = 0, queueLoop = 0, queueRand = 0;
         enum QueueLooping { NoLoop, LoopOne, LoopPlaylist };
         enum QueueRandom { NoRandom, NormalRandom, UniqueRandom };
 
@@ -403,7 +403,7 @@ namespace Endless_WinForm
         private void tsmiUniqueRandom_Click(object sender, EventArgs e) { queueRand = (int)QueueRandom.UniqueRandom; PlayinModesSwitch(queueLoop, queueRand); }
         private void mediaFinished(object? sender, EventArgs e)
         {
-            tsbStop_Click(sender ?? this, e); playlist[playlistIndex].Played = true; queue[queueIndex].Played = true; playlistUnique++;
+            tsbStop_Click(sender ?? this, e); playlist[playlistIndex].Played = true; playlistUnique++;
             switch (queueLoop)
             {
                 case (int)QueueLooping.NoLoop:
@@ -413,7 +413,6 @@ namespace Endless_WinForm
                         {
                             if (playlistIndex == playlist.Count - 1)
                             {
-                                tsbStop_Click(sender ?? this, e);
                                 foreach (musItem item in playlist) item.Played = false;
                                 foreach (musItem item in queue) item.Played = false;
                                 return;
@@ -435,14 +434,13 @@ namespace Endless_WinForm
                     else
                     {
                         for(int i = 0; i <= queue.Count - Settings.Default.queueCapacity; i++) queue.RemoveAt(0);
-                        queue.Add(playlist[playlistIndex]);
-                        loadMedia(queue[queueIndex], false);
                         switch (queueRand)
                         {
-                            case (int)QueueRandom.NoRandom: playlistIndex += Convert.ToInt32(playlistIndex == playlist.Count - 1); break;
+                            case (int)QueueRandom.NoRandom: playlistIndex += Convert.ToInt32(playlistIndex != playlist.Count - 1); break;
                             case (int)QueueRandom.NormalRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(); break;
                             case (int)QueueRandom.UniqueRandom: playlistIndex = (playlistIndex == playlist.Count - 1) ? 0 : RandomNumber(true); break;
                         }
+                        loadMedia(playlist[playlistIndex]);
                     }
                     break;
                 case (int)QueueLooping.LoopOne:
